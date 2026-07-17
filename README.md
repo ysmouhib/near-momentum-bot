@@ -36,7 +36,7 @@ sample demands (see [Results](#results--and-why-they-are-not-a-performance-claim
 The full reasoning — including the v1 failure analysis and the plateau-robustness
 checks on every parameter — is in [`docs/STRATEGY.md`](docs/STRATEGY.md).
 
-## Results — and why they are *not* a performance claim
+## Validation discipline, not performance claim
 
 **Read this section as a worked example of validation discipline, not as evidence
 that this strategy makes money.** The sample is far too small to conclude anything,
