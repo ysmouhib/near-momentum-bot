@@ -1,10 +1,15 @@
 # NEAR Momentum Bot v2 — a trend engine that survives its fees
 
-A research-first trading framework for **NEAR/USDT on Binance spot**, rebuilt from
-scratch around one hard-won finding: **on 91 days of real data, the v1 scalper lost
-82% out-of-sample** — the 4-minute edge never existed, and 0.24% round-trip costs
-made sure of the rest. v2 is what the evidence demanded: a slower, cost-aware,
-volatility-targeted trend engine with honest validation.
+A research-first trading framework for **NEAR/USDT on Binance spot**. Its purpose is
+not to present a winning strategy — it is to demonstrate **cost-aware backtesting and
+walk-forward validation done honestly**, including the part where the honest answer is
+"this isn't distinguishable from noise yet."
+
+The project is built around one hard-won, robust finding: **on 91 days of real data,
+the v1 4-minute scalper lost 82% out-of-sample** — the edge never survived 0.24%
+round-trip costs. v2 is the disciplined response: a slower, cost-aware,
+volatility-targeted trend engine, evaluated with the statistical caution the small
+sample demands (see [Results](#results--and-why-they-are-not-a-performance-claim)).
 
 [![CI](https://github.com/ysmouhib/near-momentum-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/ysmouhib/near-momentum-bot/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
@@ -31,32 +36,58 @@ volatility-targeted trend engine with honest validation.
 The full reasoning — including the v1 failure analysis and the plateau-robustness
 checks on every parameter — is in [`docs/STRATEGY.md`](docs/STRATEGY.md).
 
-## Results, honestly
+## Results — and why they are *not* a performance claim
 
-Real 91-day NEARUSDT data (April → July 2026), 60m bars, **0.10% taker fee + 0.02%
-slippage per side on every fill**. Walk-forward re-optimises a deliberately small
-grid on rolling 30-day windows and reports **only the unseen 10-day windows that
-follow**.
+**Read this section as a worked example of validation discipline, not as evidence
+that this strategy makes money.** The sample is far too small to conclude anything,
+and the most useful thing this repo does is show *how to see that* rather than hide it.
+
+Setup: real 91-day NEARUSDT data (April → July 2026), 60m bars, **0.10% taker fee +
+0.02% slippage per side on every fill**. Walk-forward re-optimises a deliberately
+small grid on rolling 30-day windows and reports **only the unseen 10-day windows
+that follow**.
 
 | Configuration | OOS return | Sharpe | Max DD | Trades |
 |---|---|---|---|---|
-| v1 scalper @ 4m (the old bot) | **−82.4%** | — | −82.5% | 714 |
+| v1 scalper @ 4m (the old bot) | −82.4% | — | −82.5% | 714 |
 | v1 scalper @ 60m | −9.4% | — | −17.0% | 39 |
-| **v2 @ 60m — walk-forward OOS** | **+10.7%** | **+2.84** | **−7.5%** | 38 |
-| v2 @ 60m — 2× cost stress | +13.3% | +3.54 | −5.9% | 36 |
-| v2 @ 60m — ETHUSDT (held-out symbol) | +5.8% | +2.15 | −7.5% | 26 |
-| v2 @ 60m — SOLUSDT (held-out symbol) | +0.3% | +0.18 | −5.7% | 35 |
+| v2 @ 60m — walk-forward OOS | +10.7% | 2.84 | −7.5% | 38 |
+| v2 @ 60m — 2× cost stress | +13.3% | 3.54 | −5.9% | 36 |
+| v2 @ 60m — ETHUSDT (held-out symbol) | +5.8% | 2.15 | −7.5% | 26 |
+| v2 @ 60m — SOLUSDT (held-out symbol) | +0.3% | 0.18 | −5.7% | 35 |
 
-Two honest caveats, stated up front: (1) over those particular OOS windows
-buy & hold made more raw return (+38.2%) with far larger drawdowns — the strategy
-was invested only ~30% of the time, which is the trade-off for the −7.5% max DD;
-(2) 90 days is one market phase, and NEAR trended well in it. That's why the held-out
-symbols and the 2× cost stress are in the table, and why you should rerun this on
-*fresh* data before believing it. The machinery to do so is the deliverable.
+### The numbers above are statistically inconclusive, on purpose
+
+I put a standard error on the headline before anyone else has to:
+
+- **The trade count is inflated.** 38 "trades" are the legs of a **top-3 ensemble**
+  over the same windows, so they are heavily correlated — the number of *independent
+  decisions* is closer to ~13. A per-trade Sharpe of 2.84 estimated on ~13 effective,
+  serially-dependent observations has a standard error wide enough that **the 95%
+  confidence interval comfortably contains zero.** One Sharpe number on this sample
+  is not evidence of skill; it is one draw from a wide distribution.
+- **The 2× cost stress going *up* (+10.7% → +13.3%) is a warning, not a win.**
+  Costs cannot improve any individual trade; the increase means the in-sample
+  optimiser simply *selected different parameters* under stressed costs. The headline
+  therefore swings by ±3 pts from perturbing the selection procedure alone — a direct
+  measurement of overfitting/selection noise, which is why it is reported, not buried.
+- **One market phase.** 91 days is a single trending regime for NEAR. ETH (+5.8%)
+  and especially SOL (**+0.3%, i.e. nothing**) on the same window are the honest
+  counter-evidence, deliberately left in.
+- **Buy & hold beat it on raw return** (+38.2% over the same windows) with far larger
+  drawdowns; the strategy was invested only ~30% of the time.
+
+**Conclusion I actually stand behind:** on the only data tested, the v1 scalper is
+*decisively* dead (−82%, a robust finding), and v2 is *not distinguishable from noise*
+at this sample size. To claim v2 has an edge you would need multi-year data with
+bootstrapped confidence intervals and a deflated Sharpe — the [roadmap](#roadmap-—-what-would-make-the-numbers-trustworthy)
+says exactly this. The deliverable here is the machinery and the discipline to reach
+that conclusion honestly, not the +10.7%.
 
 ![Walk-forward out-of-sample on real data](docs/img/walkforward_real.png)
 
-Every number above is reproducible in two commands — see below.
+Every number above is reproducible in two commands (see below) — including the ones
+that undercut the strategy.
 
 ## Quickstart
 
@@ -147,6 +178,24 @@ node experiments/parity_check.js       # JS engine == Python engine
 
 CI runs the suite and linter on Python 3.10–3.12, plus the engine parity check,
 on every push and pull request.
+
+## Roadmap — what would make the numbers trustworthy
+
+The current results are a proof-of-machinery on a small sample, not evidence of edge.
+The gap between "interesting" and "believable" is entirely statistical, and named here
+so it isn't hidden:
+
+- [ ] **Multi-year data** across several regimes, with fixed, dated windows so a run
+      is exactly reproducible (not a rolling "last 90 days").
+- [ ] **Bootstrapped confidence intervals** on OOS Sharpe and expectancy, plus a
+      **deflated Sharpe ratio** (Bailey–López de Prado) to charge for the number of
+      configurations tried.
+- [ ] **Report independent decisions, not ensemble legs** — deduplicate correlated
+      trades so the count reflects real degrees of freedom.
+- [ ] **Ablation table**: each score component alone vs. the ensemble, to show the
+      order-flow term earns its place.
+- [ ] **Paper-trading log**: forward testnet fills over time — worth more than any backtest.
+- [ ] Binance USD-M futures broker for the symmetric short side; regime classifier.
 
 ## Disclaimer
 
