@@ -45,7 +45,9 @@ def test_microsecond_timestamps_detected():
 def test_read_dump_zip_roundtrip(klines_1m, tmp_path):
     # dumps store timestamps as epoch (ms or µs), not ISO strings
     raw = klines_1m.copy()
-    raw["open_time"] = (raw["open_time"].astype("int64") // 10**6)
+    raw["open_time"] = (
+        (raw["open_time"] - pd.Timestamp("1970-01-01")) // pd.Timedelta("1ms")
+    )
     csv_bytes = raw.to_csv(index=False, header=False).encode()
     zp = tmp_path / "NEARUSDT-1m-2026-01-01.zip"
     with zipfile.ZipFile(zp, "w") as z:
