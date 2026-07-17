@@ -39,6 +39,5 @@ data.binance.vision), aggregated to 60m:
 | v2, top-3, ETHUSDT (held-out symbol) | +5.8% |
 | v2, top-3, SOLUSDT (held-out symbol, downtrend) | +0.3% (was −5.9% without the trend filter) |
 
-The packaged engine's slightly different (exact per-bar) accounting reports
-+10.7% OOS on the same data — same trades, more precise bookkeeping. Plateau
-table: docs/STRATEGY.md §7.
+These are single-sample research-run figures, subject to the same statistical caveats as the main README (small effective sample, selection noise); they are process evidence, not performance evidence.
+
