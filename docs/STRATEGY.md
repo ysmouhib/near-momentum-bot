@@ -136,9 +136,14 @@ own market impact. Treat results as an upper bound.
 * **Held-out symbols.** ETH and SOL were never used to pick defaults; they show
   +5.8% and +0.3% OOS respectively — the design generalises, the strength is
   asset- and phase-dependent.
-* **Cost stress.** At 2× fees+slippage the NEAR OOS result barely moved
-  (+13.3% vs +14.5% in the research run): the edge is not riding the cost
-  assumption.
+* **Cost stress — and what it actually reveals.** At 2× fees+slippage the NEAR
+  OOS return did *not* fall; it moved to +13.3%. This is not a robustness win —
+  costs can only lower any individual trade's net return, so the only way the
+  aggregate rises is that the in-sample optimiser **selected a different set of
+  combos** under stressed costs. The headline therefore shifts by ~3 pts from
+  perturbing the *selection procedure alone*, which is a direct, honest
+  measurement of this pipeline's overfitting/selection variance on a 91-day
+  sample. It is reported for that reason, not spun as stability.
 * **Plateau check.** Every default was perturbed one at a time (research run on
   real NEAR data, walk-forward OOS):
 
