@@ -9,7 +9,7 @@ The project is built around one hard-won, robust finding: **on 91 days of real d
 the v1 4-minute scalper lost 82% out-of-sample** — the edge never survived 0.24%
 round-trip costs. v2 is the disciplined response: a slower, cost-aware,
 volatility-targeted trend engine, evaluated with the statistical caution the small
-sample demands (see [Results](#results--and-why-they-are-not-a-performance-claim)).
+sample demands.
 
 [![CI](https://github.com/ysmouhib/near-momentum-bot/actions/workflows/ci.yml/badge.svg)](https://github.com/ysmouhib/near-momentum-bot/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
