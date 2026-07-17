@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>near-momentum-bot v2 — a trend engine that survives its fees</title>
+<meta name="description" content="Cost-aware, volatility-targeted trend following on Binance spot. Honest walk-forward validation, browser simulator, MIT licensed.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1f2;--panel:#ffffff;--ink:#16232a;--ink-soft:#4b5a63;
+    --teal:#1f6f8b;--teal-deep:#155066;--clay:#c34a36;--seafoam:#4b8f8c;--grid:#d5dde0;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"IBM Plex Sans",system-ui,sans-serif;
+    --disp:"Archivo",var(--sans);
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font:400 15.5px/1.65 var(--sans)}
+  a{color:var(--teal-deep)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+  header.top{border-bottom:1px solid var(--grid);background:var(--panel);position:sticky;top:0;z-index:5}
+  .top .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+  .brand{font:600 15px var(--mono);color:var(--ink);text-decoration:none}
+  .brand b{color:var(--teal)}
+  nav.links{display:flex;gap:22px;font:500 13.5px var(--sans)}
+  nav.links a{text-decoration:none;color:var(--ink-soft)}
+  nav.links a:hover{color:var(--teal-deep)}
+  nav.links a.cta{color:var(--teal-deep);font-weight:600}
+
+  section{padding:44px 0}
+  .hero{padding:64px 0 40px}
+  .kicker{font:500 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+  h1{font:800 clamp(30px,5vw,52px)/1.06 var(--disp);font-stretch:115%;letter-spacing:-.02em;max-width:16ch}
+  h1 em{font-style:normal;color:var(--teal)}
+  .hero p.lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:64ch}
+  .actions{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+  .btn{display:inline-block;border-radius:6px;padding:12px 20px;font:600 14.5px var(--sans);cursor:pointer;text-decoration:none}
+  .btn.solid{background:var(--teal);color:#fff}
+  .btn.solid:hover{background:var(--teal-deep)}
+  .btn.line{border:1px solid var(--grid);color:var(--ink);background:var(--panel)}
+  .btn.line:hover{border-color:var(--teal)}
+
+  h2{font:750 clamp(21px,3vw,28px)/1.2 var(--disp);font-stretch:110%;letter-spacing:-.01em;margin-bottom:14px}
+  h3{font:700 15px var(--disp);letter-spacing:.01em;margin:22px 0 8px}
+  .prose{max-width:74ch;color:var(--ink-soft)}
+  .prose b{color:var(--ink)}
+  .prose code{font:400 13px var(--mono);background:#f1f4f5;border:1px solid var(--grid);border-radius:4px;padding:1px 5px}
+  .prose p+p{margin-top:10px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+  @media(max-width:840px){.grid2,.grid3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:18px}
+  .card h3{margin-top:0}
+  .card p{color:var(--ink-soft);font-size:14px}
+
+  table.res{width:100%;border-collapse:collapse;font:400 13.5px var(--mono);margin-top:16px;background:var(--panel);border:1px solid var(--grid);border-radius:10px;overflow:hidden}
+  .res th,.res td{padding:9px 12px;text-align:right;border-top:1px solid var(--grid)}
+  .res th:first-child,.res td:first-child{text-align:left}
+  .res thead th{border-top:0;font:500 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:#f6f8f9}
+  .pos{color:var(--teal-deep)}.neg{color:var(--clay)}
+  .caption{font:400 12px var(--sans);color:var(--ink-soft);margin-top:8px}
+
+  pre{background:#10181c;color:#d9e2e6;border-radius:10px;padding:16px 18px;font:400 13px/1.7 var(--mono);overflow-x:auto;margin-top:14px}
+  pre .c{color:#7d919b}
+  figure{margin-top:18px}
+  figure img{width:100%;border:1px solid var(--grid);border-radius:10px;background:var(--panel)}
+  figcaption{font:400 12px var(--sans);color:var(--ink-soft);margin-top:6px}
+  .pill{display:inline-block;font:500 11px var(--mono);border:1px solid var(--grid);border-radius:99px;padding:2px 10px;color:var(--ink-soft);background:var(--panel);margin:2px 4px 2px 0}
+  footer{border-top:1px solid var(--grid);padding:26px 0 40px;font:400 12.5px var(--sans);color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#">near-momentum-bot <b>v2</b></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#results">Results</a>
+      <a href="#method">Methodology</a>
+      <a href="#quickstart">Quickstart</a>
+      <a class="cta" href="simulator.html">Open the simulator →</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="kicker">Binance spot · trend following · cost-aware</div>
+    <h1>A trend engine that <em>survives its fees</em>.</h1>
+    <p class="lede">v1 of this bot was an honest failure: a 4-minute momentum scalper that lost
+    <b>82% out-of-sample</b> on real data — the edge never existed, and 0.24% round-trip costs made
+    sure of the rest. v2 is the ground-up rewrite: a slow, vol-targeted trend engine with a
+    continuous conviction score, regime gates, and walk-forward validation as the only number
+    it believes in.</p>
+    <div class="actions">
+      <a class="btn solid" href="simulator.html">Run it on real data, in your browser</a>
+      <a class="btn line" href="https://github.com/ysmouhib/near-momentum-bot">Source on GitHub</a>
+    </div>
+    <p style="margin-top:16px">
+      <span class="pill">no API key needed for simulation</span>
+      <span class="pill">fees + slippage on every fill</span>
+      <span class="pill">walk-forward out-of-sample only</span>
+      <span class="pill">MIT licensed</span>
+    </p>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2>Results, honestly</h2>
+    <p class="prose">91 days of real NEARUSDT 1-minute data (mid-April → mid-July 2026), aggregated
+    to 60-minute bars, with Binance taker fees (0.10%/side) and slippage (0.02%/side) charged on
+    every fill. The number that matters is the <b>walk-forward out-of-sample</b> row: parameters are
+    re-optimised on rolling 30-day windows and performance is measured only on the unseen days
+    that follow.</p>
+    <table class="res">
+      <thead><tr><th>Configuration</th><th>OOS return</th><th>Sharpe</th><th>Max DD</th><th>Trades</th><th>Win rate</th></tr></thead>
+      <tbody>
+        <tr><td>v1 scalper @ 4m (the old bot)</td><td class="neg">−82.4%</td><td>—</td><td>−82.5%</td><td>714</td><td>23.8%</td></tr>
+        <tr><td>v1 scalper @ 60m (same strategy, slower)</td><td class="neg">−9.4%</td><td>—</td><td>−17.0%</td><td>39</td><td>—</td></tr>
+        <tr><td><b>v2 @ 60m — walk-forward OOS</b></td><td class="pos"><b>+10.7%</b></td><td>+2.84</td><td>−7.5%</td><td>38</td><td>47.4%</td></tr>
+        <tr><td>v2 @ 60m — OOS with <b>2× costs</b> (stress)</td><td class="pos">+13.3%*</td><td>+3.54</td><td>−5.9%</td><td>36</td><td>—</td></tr>
+        <tr><td>v2 @ 60m — ETHUSDT (held-out symbol)</td><td class="pos">+5.8%</td><td>+2.15</td><td>−7.5%</td><td>26</td><td>42%</td></tr>
+        <tr><td>v2 @ 60m — SOLUSDT (held-out symbol)</td><td class="pos">+0.3%</td><td>+0.18</td><td>−5.7%</td><td>35</td><td>29%</td></tr>
+      </tbody>
+    </table>
+    <p class="caption">*cost-stress figure from the research run with the top-3 ensemble; see
+    experiments/. Buy &amp; hold over the same OOS windows returned +38.2% with far larger
+    drawdowns — the strategy traded 30% of the time and took on a fraction of the risk. Risk-adjusted,
+    not raw, return is the point. Every number above is reproducible in two commands (see Quickstart).</p>
+    <figure>
+      <img src="img/walkforward_real.png" alt="Walk-forward out-of-sample equity curve on real NEARUSDT data">
+      <figcaption>Walk-forward out-of-sample equity, drawdown and return distribution — real
+      NEARUSDT data, net of all costs. Generated by <code>python -m near_bot walkforward --plot</code>.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <h2>What changed, and why it matters</h2>
+    <p class="prose">v1 AND-ed six binary conditions into a 4-minute entry signal. Binary gates are
+    brittle (nudge one threshold and trades flip on/off — the signature of curve-fitting), and the
+    4-minute timeframe made fees mathematically unbeatable. v2 keeps the two good ideas (order flow
+    from taker-buy volume, walk-forward discipline) and rebuilds everything else:</p>
+    <div class="grid2">
+      <div class="card"><h3>1. A score, not a checklist</h3>
+        <p>Conviction is a continuous blend in [−1, 1]: volatility-normalised time-series momentum
+        (fast + slow), Donchian breakout position, and smoothed taker-imbalance order flow. Signal
+        strength now means something, and parameters move results smoothly instead of flipping
+        individual trades.</p></div>
+      <div class="card"><h3>2. Regime gates</h3>
+        <p>A Kaufman efficiency-ratio filter refuses to trade chop, and a 200-bar trend filter
+        refuses to buy downtrends. On 90 days of real data the trend filter alone moved a falling
+        asset (SOL) from −5.9% to +0.3% out-of-sample: you cannot buy your way out of a downtrend,
+        but you can decline to try.</p></div>
+      <div class="card"><h3>3. Hysteresis — the cost-aware band</h3>
+        <p>Enter when the score crosses θ<sub>in</sub>, exit when it fades below
+        θ<sub>out</sub> &lt; θ<sub>in</sub>. The band between them is the no-trade region where
+        expected edge is smaller than round-trip cost. This is where most scalping systems donate
+        their P&amp;L to the exchange.</p></div>
+      <div class="card"><h3>4. Volatility-targeted sizing</h3>
+        <p>Position weight = target annualised vol ÷ realised vol, capped at 100%. Quiet markets
+        get bigger positions, wild markets smaller ones — risk stays constant across regimes, which
+        is what makes the Sharpe ratio of a trend system meaningful.</p></div>
+      <div class="card"><h3>5. A timeframe where fees are beatable</h3>
+        <p>Costs are fixed per trade; trends scale with time. At 4 minutes the average move is a
+        rounding error next to 0.24% round-trip costs; at 60 minutes it isn't. The default grid
+        searches slower bars, not faster ones.</p></div>
+      <div class="card"><h3>6. Top-k walk-forward ensemble</h3>
+        <p>Instead of trading the single best in-sample parameter set (mostly luck), each window
+        trades the top-3 and averages them. On real data the ensemble doubled the OOS trade count
+        while raising OOS Sharpe — selection variance traded away.</p></div>
+    </div>
+    <p class="prose" style="margin-top:18px">Full reasoning, the failure analysis of v1, and the
+    plateau-robustness table are in
+    <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/docs/STRATEGY.md">docs/STRATEGY.md</a>.</p>
+  </div>
+</section>
+
+<section id="quickstart">
+  <div class="wrap">
+    <h2>Reproduce every number</h2>
+    <pre><span class="c"># install</span>
+git clone https://github.com/ysmouhib/near-momentum-bot.git && cd near-momentum-bot
+pip install -e ".[dev,plot]"
+
+<span class="c"># download 90 days of real 1m data (no API key; uses Binance's public dumps)</span>
+python scripts/download_data.py --symbol NEARUSDT --days 90
+
+<span class="c"># fixed-config backtest</span>
+near-bot backtest --csv data/klines_1m.csv --trades --plot reports/backtest.png
+
+<span class="c"># the number that matters: walk-forward out-of-sample</span>
+near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png</pre>
+    <p class="prose" style="margin-top:14px">Or skip the terminal entirely: the
+    <a href="simulator.html">browser simulator</a> runs the same engine (parity-checked
+    trade-for-trade against the Python code) on live Binance data, with every parameter adjustable —
+    including walk-forward validation in-page.</p>
+    <figure>
+      <img src="img/backtest_real.png" alt="Fixed-config backtest on real NEARUSDT data with position weights">
+      <figcaption>Fixed-config backtest with buy &amp; hold comparison and the volatility-targeted
+      position weight over time.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>Disclaimer.</b> For education and research only — not financial advice. Crypto trading
+    carries substantial risk of loss. Simulated results ignore partial fills, order-book depth and
+    latency, and past out-of-sample performance does not guarantee future returns. The defaults are
+    a starting point: revalidate on fresh data before trading, use the testnet first, and never
+    risk money you cannot afford to lose. MIT licensed.</p>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "near-momentum-bot"
+version = "2.0.0"
+description = "Cost-aware, volatility-targeted trend-following framework for Binance spot"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "requests>=2.31",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+live = ["python-binance>=1.0.19"]
+plot = ["matplotlib>=3.7"]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+near-bot = "near_bot.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

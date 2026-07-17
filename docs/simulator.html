@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulator — near-momentum-bot v2</title>
+<meta name="description" content="Run the bot's exact v2 engine on real Binance history, in your browser: score-ensemble trend following with volatility targeting, fully cost-aware. No account, no API key.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1f2;--panel:#ffffff;--ink:#16232a;--ink-soft:#4b5a63;
+    --teal:#1f6f8b;--teal-deep:#155066;--clay:#c34a36;--seafoam:#4b8f8c;--grid:#d5dde0;
+    --mono:"IBM Plex Mono",ui-monospace,monospace;--sans:"IBM Plex Sans",system-ui,sans-serif;
+    --disp:"Archivo",var(--sans);
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font:400 15px/1.6 var(--sans)}
+  a{color:var(--teal-deep)}
+  a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  header.top{border-bottom:1px solid var(--grid);background:var(--panel)}
+  .top .wrap{display:flex;align-items:center;justify-content:space-between;height:58px}
+  .brand{font:600 15px var(--mono);color:var(--ink);text-decoration:none}
+  .brand b{color:var(--teal)}
+  nav.links{display:flex;gap:22px;font:500 13.5px var(--sans)}
+  nav.links a{text-decoration:none;color:var(--ink-soft)}
+  nav.links a:hover{color:var(--teal-deep)}
+
+  .head{padding:34px 0 8px}
+  h1{font:800 clamp(26px,4vw,40px)/1.1 var(--disp);font-stretch:112%;letter-spacing:-.015em}
+  .head p{color:var(--ink-soft);max-width:76ch;margin-top:8px}
+  .head p code{font:400 12.5px var(--mono);background:#f1f4f5;border:1px solid var(--grid);border-radius:4px;padding:1px 5px}
+
+  .layout{display:grid;grid-template-columns:350px 1fr;gap:22px;padding:22px 0 60px;align-items:start}
+  @media(max-width:960px){.layout{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:18px}
+  .card h2{font:700 15px var(--disp);font-stretch:108%;letter-spacing:.01em;margin-bottom:12px}
+  .card + .card{margin-top:16px}
+
+  fieldset{border:0;padding:0;margin:0 0 14px}
+  legend{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal);padding:0;margin-bottom:8px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+  label.f{display:block;font:500 11.5px var(--sans);color:var(--ink-soft)}
+  label.f input,label.f select{width:100%;margin-top:3px;padding:6px 8px;border:1px solid var(--grid);border-radius:6px;font:400 13px var(--mono);color:var(--ink);background:#fbfcfc}
+  .btn{display:inline-block;border:0;border-radius:6px;padding:10px 16px;font:600 14px var(--sans);cursor:pointer;text-decoration:none}
+  .btn.solid{background:var(--teal);color:#fff}
+  .btn.solid:hover{background:var(--teal-deep)}
+  .btn.solid:disabled{background:#9db8c2;cursor:not-allowed}
+  .btn.line{border:1px solid var(--grid);color:var(--ink);background:var(--panel)}
+  .btn.line:hover{border-color:var(--teal)}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .hint{font:400 12px var(--sans);color:var(--ink-soft);margin-top:8px}
+  .status{font:400 12.5px var(--mono);color:var(--ink-soft);margin-top:10px;min-height:18px}
+  .status.err{color:var(--clay)}
+  .status.ok{color:var(--teal-deep)}
+
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}}
+  .metric{background:#f6f8f9;border:1px solid var(--grid);border-radius:8px;padding:10px 12px}
+  .metric .v{font:500 19px var(--mono)}
+  .metric .v.up{color:var(--teal-deep)}.metric .v.dn{color:var(--clay)}
+  .metric .k{font:500 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);margin-top:2px}
+
+  svg.chart{width:100%;height:auto;display:block;margin-top:6px}
+  svg.chart text{font:500 10.5px var(--mono);fill:var(--ink-soft)}
+
+  table.tr{width:100%;border-collapse:collapse;font:400 12.5px var(--mono);margin-top:6px}
+  .tr th,.tr td{padding:6px 8px;text-align:right;border-top:1px solid var(--grid);white-space:nowrap}
+  .tr th:first-child,.tr td:first-child{text-align:left}
+  .tr thead th{border-top:0;font:500 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .pos{color:var(--teal-deep)}.neg{color:var(--clay)}
+  .wf{margin-top:14px}
+  .disclaimer{font:400 12px var(--sans);color:var(--ink-soft);border-top:1px solid var(--grid);margin-top:16px;padding-top:12px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html">near-momentum-bot <b>v2 simulator</b></a>
+    <nav class="links" aria-label="Sections">
+      <a href="index.html">Project</a>
+      <a href="index.html#method">Methodology</a>
+      <a href="https://github.com/ysmouhib/near-momentum-bot">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap head">
+  <h1>Backtest on real history, in your browser</h1>
+  <p>This page runs the <em>same engine the bot trades</em> — a JavaScript port of the Python
+  engine, pinned to it trade-for-trade by an automated parity check. It fetches public 1-minute
+  klines straight from Binance (no account, no key; nothing leaves your browser), aggregates them,
+  and simulates the v2 strategy with the parameters you choose: conviction-score entries with
+  hysteresis, volatility-target sizing, fees and slippage on every fill, walk-forward
+  out-of-sample validation on demand.</p>
+</div>
+
+<div class="wrap layout">
+  <div>
+    <div class="card">
+      <h2>Data</h2>
+      <div class="grid2">
+        <label class="f">Symbol
+          <input id="symbol" value="NEARUSDT" autocomplete="off" spellcheck="false"></label>
+        <label class="f">History
+          <select id="days">
+            <option value="14">14 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="60">60 days</option>
+            <option value="90">90 days</option>
+          </select></label>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn solid" id="fetchBtn">Fetch from Binance</button>
+        <label class="btn line" for="csvFile" style="margin:0">Upload CSV</label>
+        <input type="file" id="csvFile" accept=".csv" style="display:none">
+      </div>
+      <div class="status" id="dataStatus" role="status">No data loaded.</div>
+      <p class="hint">90 days ≈ 130 requests to Binance's public API (~1 min). If Binance is
+      unreachable from your region, upload a CSV made by
+      <span style="font-family:var(--mono);font-size:11.5px">scripts/download_data.py</span> instead.</p>
+    </div>
+
+    <div class="card">
+      <h2>Parameters</h2>
+      <fieldset><legend>Timeframe & momentum</legend>
+        <div class="grid2">
+          <label class="f">Aggregate (min)<input id="p_agg" type="number" value="60" min="1" step="1"></label>
+          <label class="f">Vol window<input id="p_vol_win" type="number" value="48" min="5" step="1"></label>
+          <label class="f">Momentum fast<input id="p_mom_fast" type="number" value="36" min="2" step="1"></label>
+          <label class="f">Momentum slow<input id="p_mom_slow" type="number" value="120" min="5" step="1"></label>
+          <label class="f">Breakout window<input id="p_bo_win" type="number" value="48" min="5" step="1"></label>
+          <label class="f">Order-flow window<input id="p_ofi_win" type="number" value="24" min="3" step="1"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Blend weights</legend>
+        <div class="grid2">
+          <label class="f">w momentum<input id="p_w_mom" type="number" value="0.50" step="0.05"></label>
+          <label class="f">w breakout<input id="p_w_bo" type="number" value="0.30" step="0.05"></label>
+          <label class="f">w order flow<input id="p_w_ofi" type="number" value="0.20" step="0.05"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Regime gates</legend>
+        <div class="grid2">
+          <label class="f">ER window<input id="p_er_win" type="number" value="48" min="5" step="1"></label>
+          <label class="f">ER min (chop gate)<input id="p_er_min" type="number" value="0.20" step="0.05" min="0" max="1"></label>
+          <label class="f">Trend MA window<input id="p_trend_win" type="number" value="200" min="10" step="1"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Hysteresis & exits</legend>
+        <div class="grid2">
+          <label class="f">theta in (enter &gt;)<input id="p_theta_in" type="number" value="0.25" step="0.05"></label>
+          <label class="f">theta out (exit &lt;)<input id="p_theta_out" type="number" value="0.0" step="0.05"></label>
+          <label class="f">ATR period<input id="p_atr_period" type="number" value="14" min="2" step="1"></label>
+          <label class="f">Trail × ATR<input id="p_trail_atr" type="number" value="3.0" step="0.5"></label>
+          <label class="f">Max hold (bars)<input id="p_max_hold" type="number" value="168" min="1" step="1"></label>
+        </div>
+      </fieldset>
+      <fieldset><legend>Sizing & costs</legend>
+        <div class="grid2">
+          <label class="f">Target vol (ann.)<input id="p_target_vol" type="number" value="0.40" step="0.05"></label>
+          <label class="f">Min weight<input id="p_min_weight" type="number" value="0.05" step="0.01" min="0"></label>
+          <label class="f">Taker fee / side<input id="p_fee" type="number" value="0.001" step="0.00025"></label>
+          <label class="f">Slippage / side<input id="p_slip" type="number" value="0.0002" step="0.0001"></label>
+          <label class="f">Notional (USDT)<input id="p_capital" type="number" value="1000" step="100"></label>
+        </div>
+      </fieldset>
+      <div class="row">
+        <button class="btn solid" id="runBtn" disabled>Run backtest</button>
+        <button class="btn solid" id="wfBtn" disabled title="Optimise on rolling in-sample windows, report out-of-sample only">Walk-forward</button>
+        <button class="btn line" id="resetBtn" type="button">Reset defaults</button>
+      </div>
+      <div class="status" id="runStatus" role="status"></div>
+      <p class="hint"><b>Walk-forward</b> re-optimises a small grid (theta_in × trail × ER min)
+      on rolling 30-day windows, trades the top-3 combos on the following 10 days, and reports
+      <em>only</em> out-of-sample results. That number — not the fixed backtest — is the honest one.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>Result</h2>
+      <div id="empty" class="hint">Load data and run a backtest to see the gain/loss here.</div>
+      <div id="results" hidden>
+        <div class="metrics" id="metricGrid"></div>
+        <svg class="chart" id="chart" viewBox="0 0 900 400" role="img" aria-label="Equity curve, buy and hold, and drawdown"></svg>
+        <div class="wf" id="wfPanel" hidden>
+          <h2 style="margin-top:10px">Walk-forward windows</h2>
+          <div style="overflow-x:auto"><table class="tr" id="wfTable">
+            <thead><tr><th>Test window</th><th>IS Sharpe (top-3)</th><th>OOS return</th><th>OOS trades</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </div>
+        <h2 style="margin-top:16px">Trades <span id="tradeCount" style="font:400 12px var(--mono);color:var(--ink-soft)"></span></h2>
+        <div style="overflow-x:auto"><table class="tr" id="tradeTable">
+          <thead><tr><th>Entry (UTC)</th><th>Exit</th><th>Held</th><th>Reason</th><th>Weight</th><th>Entry px</th><th>Exit px</th><th>Net %</th><th>Net USDT</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+      <p class="disclaimer">Simulated results ignore partial fills, order-book depth and latency. A
+      fixed-parameter backtest over one window is an optimistic upper bound — the walk-forward
+      numbers are the honest ones. Educational use only; not financial advice.</p>
+    </div>
+  </div>
+</div>
+
+<script src="engine.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const E = window.NearBotEngine;
+const HOSTS = ["https://api.binance.com", "https://api1.binance.com",
+               "https://api2.binance.com", "https://api3.binance.com"];
+let rows1m = null;
+
+const DEFAULTS = { p_agg:60,p_vol_win:48,p_mom_fast:36,p_mom_slow:120,p_bo_win:48,p_ofi_win:24,
+  p_w_mom:0.50,p_w_bo:0.30,p_w_ofi:0.20,p_er_win:48,p_er_min:0.20,p_trend_win:200,
+  p_theta_in:0.25,p_theta_out:0.0,p_atr_period:14,p_trail_atr:3.0,p_max_hold:168,
+  p_target_vol:0.40,p_min_weight:0.05,p_fee:0.001,p_slip:0.0002,p_capital:1000 };
+
+function setStatus(el, msg, cls) { el.textContent = msg; el.className = "status" + (cls ? " " + cls : ""); }
+
+function readParams() {
+  const num = id => parseFloat($(id).value);
+  const int = id => parseInt($(id).value, 10);
+  const p = Object.assign(E.defaultParams(), {
+    mom_fast:int("p_mom_fast"), mom_slow:int("p_mom_slow"), vol_window:int("p_vol_win"),
+    bo_window:int("p_bo_win"), ofi_window:int("p_ofi_win"),
+    w_mom:num("p_w_mom"), w_bo:num("p_w_bo"), w_ofi:num("p_w_ofi"),
+    er_window:int("p_er_win"), er_min:num("p_er_min"), trend_window:int("p_trend_win"),
+    theta_in:num("p_theta_in"), theta_out:num("p_theta_out"),
+    atr_period:int("p_atr_period"), trail_atr:num("p_trail_atr"), max_hold_bars:int("p_max_hold"),
+    target_vol:num("p_target_vol"), min_weight:num("p_min_weight"),
+  });
+  const costs = { taker_fee:num("p_fee"), slippage:num("p_slip") };
+  return { p, costs, agg:int("p_agg"), capital:num("p_capital") };
+}
+
+// ------------------------------------------------------------ data loading
+async function fetchKlines() {
+  const symbol = $("symbol").value.trim().toUpperCase();
+  const days = parseInt($("days").value, 10);
+  const end = Date.now();
+  let cursor = end - days * 86400000;
+  const out = [];
+  $("fetchBtn").disabled = true;
+  try {
+    let hostIdx = 0;
+    while (cursor < end) {
+      const url = `${HOSTS[hostIdx]}/api/v3/klines?symbol=${symbol}&interval=1m` +
+                  `&startTime=${cursor}&endTime=${end}&limit=1000`;
+      let resp;
+      try { resp = await fetch(url); }
+      catch (e) { if (++hostIdx < HOSTS.length) continue; throw e; }
+      if (resp.status === 451 || resp.status === 403)
+        throw new Error(`Binance returned ${resp.status} — the API is not available from your region. Use the CSV upload instead.`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} from Binance`);
+      const batch = await resp.json();
+      if (!batch.length) break;
+      for (const k of batch) out.push({ t:k[0], open:+k[1], high:+k[2], low:+k[3],
+                                        close:+k[4], volume:+k[5], taker_buy:+k[9] });
+      cursor = batch[batch.length - 1][6] + 1;
+      setStatus($("dataStatus"), `Fetching ${symbol}: ${out.length.toLocaleString()} bars…`);
+      await new Promise(r => setTimeout(r, 40));
+    }
+    if (!out.length) throw new Error("No data returned — check the symbol.");
+    rows1m = out;
+    const from = new Date(out[0].t).toISOString().slice(0, 10);
+    const to = new Date(out[out.length - 1].t).toISOString().slice(0, 10);
+    setStatus($("dataStatus"), `Loaded ${out.length.toLocaleString()} × 1m bars of ${symbol} (${from} → ${to}).`, "ok");
+    $("runBtn").disabled = false;
+    $("wfBtn").disabled = false;
+  } catch (e) {
+    setStatus($("dataStatus"), e.message, "err");
+  } finally {
+    $("fetchBtn").disabled = false;
+  }
+}
+
+function parseCsv(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const head = lines[0].split(",").map(s => s.trim());
+  const col = name => head.indexOf(name);
+  const it = col("open_time"), io = col("open"), ih = col("high"), il = col("low"),
+        ic = col("close"), iv = col("volume"), ib = col("taker_buy_base");
+  if ([it, io, ih, il, ic, iv, ib].some(x => x < 0))
+    throw new Error("CSV must have the columns written by scripts/download_data.py (open_time … taker_buy_base).");
+  const out = [];
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(",");
+    if (c.length < head.length) continue;
+    let t = c[it];
+    t = /^\d+$/.test(t) ? +t : Date.parse(t.includes("T") ? t : t.replace(" ", "T") + "Z");
+    out.push({ t, open:+c[io], high:+c[ih], low:+c[il], close:+c[ic],
+               volume:+c[iv], taker_buy:+c[ib] });
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- rendering
+function fmtPct(x, dp = 2) { return (x >= 0 ? "+" : "") + (100 * x).toFixed(dp) + "%"; }
+function fmtTime(ms) { return new Date(ms).toISOString().slice(0, 16).replace("T", " "); }
+function metricCell(v, k, cls) {
+  return `<div class="metric"><div class="v ${cls || ""}">${v}</div><div class="k">${k}</div></div>`;
+}
+
+function drawChart(eq, bh, pos) {
+  const svg = $("chart");
+  const W = 900, Heq = 240, Hdd = 100, pad = 48, top = 12;
+  const n = eq.length;
+  const all = eq.concat(bh);
+  const min = Math.min(...all), max = Math.max(...all);
+  const span = Math.max(1e-9, max - min);
+  const x = i => pad + (i / Math.max(1, n - 1)) * (W - pad - 12);
+  const yEq = v => top + (1 - (v - min) / span) * (Heq - top - 6);
+  let peak = -Infinity; const dd = eq.map(v => { peak = Math.max(peak, v); return v / peak - 1; });
+  const ddMin = Math.min(-1e-9, ...dd);
+  const yDd = v => Heq + 26 + (v / ddMin) * (Hdd - 10);
+  const pts = a => a.map((v, i) => `${x(i).toFixed(1)},${yEq(v).toFixed(1)}`).join(" ");
+  const ddPts = dd.map((v, i) => `${x(i).toFixed(1)},${yDd(v).toFixed(1)}`).join(" ");
+  // position weight as light bars behind drawdown
+  let posBars = "";
+  if (pos) {
+    const bw = Math.max(1, (W - pad - 12) / n);
+    for (let i = 0; i < n; i++) if (pos[i] > 0)
+      posBars += `<rect x="${x(i).toFixed(1)}" y="${(Heq + 26).toFixed(1)}" width="${bw.toFixed(1)}" height="${(pos[i] * (Hdd - 10)).toFixed(1)}" fill="var(--seafoam)" opacity="0.35"/>`;
+  }
+  svg.innerHTML = `
+    <line x1="${pad}" y1="${yEq(1).toFixed(1)}" x2="${W - 12}" y2="${yEq(1).toFixed(1)}" stroke="var(--ink-soft)" stroke-dasharray="4 5" stroke-width="1"/>
+    <polyline points="${pts(bh)}" fill="none" stroke="#9aa7ad" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <polyline points="${pts(eq)}" fill="none" stroke="var(--teal)" stroke-width="2"/>
+    <text x="2" y="${yEq(max).toFixed(1)}">${max.toFixed(2)}×</text>
+    <text x="2" y="${yEq(min).toFixed(1)}">${min.toFixed(2)}×</text>
+    <text x="2" y="${(yEq(1) + 4).toFixed(1)}">1.00×</text>
+    <text x="${pad}" y="${top + 2}" fill="var(--teal)">— strategy</text>
+    <text x="${pad + 80}" y="${top + 2}" fill="#9aa7ad">- - buy & hold</text>
+    ${posBars}
+    <polygon points="${pad},${yDd(0)} ${ddPts} ${W - 12},${yDd(0)}" fill="var(--clay)" opacity="0.55"/>
+    <text x="2" y="${(yDd(ddMin) + 4).toFixed(1)}">${(100 * ddMin).toFixed(1)}%</text>
+    <text x="${pad}" y="${Heq + Hdd + 24}">bar 0</text>
+    <text x="${W - 90}" y="${Heq + Hdd + 24}">bar ${n - 1}</text>
+    <text x="${W / 2 - 70}" y="${Heq + Hdd + 24}">drawdown + position weight</text>`;
+}
+
+function equityOf(retArr) {
+  const out = [1.0];
+  for (const r of retArr) out.push(out[out.length - 1] * (1 + r));
+  return out;
+}
+
+function renderResult(m, capital, note) {
+  $("empty").hidden = true; $("results").hidden = false;
+  const usd = capital * m.total_return;
+  $("metricGrid").innerHTML =
+    metricCell(fmtPct(m.total_return), `total return, net ${note}`, m.total_return >= 0 ? "up" : "dn") +
+    metricCell((usd >= 0 ? "+" : "") + usd.toFixed(2), `USDT on ${capital.toLocaleString()}`, usd >= 0 ? "up" : "dn") +
+    metricCell(fmtPct(m.buy_hold), "buy & hold", m.buy_hold >= 0 ? "up" : "dn") +
+    metricCell(m.n_trades, "trades") +
+    metricCell(fmtPct(m.win_rate, 1), "win rate") +
+    metricCell(m.sharpe.toFixed(2), "sharpe (ann.)", m.sharpe >= 0 ? "up" : "dn") +
+    metricCell(fmtPct(m.max_drawdown), "max drawdown", "dn") +
+    metricCell(fmtPct(m.exposure, 0), "exposure") +
+    metricCell(fmtPct(m.expectancy_weighted, 3), "expectancy / trade") +
+    metricCell(fmtPct(m.cost_drag, 3), "cost drag / trade", "dn") +
+    metricCell(m.turnover.toFixed(1) + "×", "turnover") +
+    metricCell(m.avg_bars_held ? m.avg_bars_held.toFixed(1) : "—", "avg bars held");
+}
+
+function renderTrades(trades, capital, agg) {
+  const tbody = $("tradeTable").tBodies[0];
+  const rows = trades.slice(-40).reverse();
+  $("tradeCount").textContent = `(showing last ${rows.length} of ${trades.length}, newest first)`;
+  tbody.innerHTML = rows.map(t => {
+    const cls = t.weighted_net >= 0 ? "pos" : "neg";
+    return `<tr><td>${fmtTime(t.entry_time)}</td><td>${fmtTime(t.exit_time)}</td>` +
+      `<td>${t.bars_held}</td><td>${t.reason_out}</td><td>${t.weight.toFixed(2)}</td>` +
+      `<td>${t.entry_price.toFixed(4)}</td><td>${t.exit_price.toFixed(4)}</td>` +
+      `<td class="${cls}">${fmtPct(t.weighted_net, 3)}</td>` +
+      `<td class="${cls}">${(capital * t.weighted_net).toFixed(2)}</td></tr>`;
+  }).join("");
+}
+
+function runBacktest() {
+  if (!rows1m) return;
+  const { p, costs, agg, capital } = readParams();
+  const t0 = performance.now();
+  const bars = E.aggregate(rows1m, agg, true);
+  const frame = E.addAll(bars, p);
+  const score = E.computeScore(frame, p);
+  const res = E.run(frame, p, costs, agg, score);
+  const ms = performance.now() - t0;
+  const m = res.metrics;
+  $("wfPanel").hidden = true;
+  if (!m.n_trades) {
+    $("results").hidden = false; $("empty").hidden = true;
+    $("metricGrid").innerHTML = metricCell("0", "trades taken") +
+      metricCell("—", "no signal cleared the gates");
+    $("chart").innerHTML = ""; $("tradeTable").tBodies[0].innerHTML = ""; $("tradeCount").textContent = "";
+    setStatus($("runStatus"), `Ran ${bars.length.toLocaleString()} bars in ${ms.toFixed(0)} ms — no trades.`, "ok");
+    return;
+  }
+  renderResult(m, capital, "(fixed config)");
+  const eq = equityOf(res.bar_returns);
+  const bh = [1.0];
+  for (let i = 1; i < frame.n; i++) bh.push(bh[i - 1] * frame.close[i] / frame.close[i - 1]);
+  drawChart(eq.slice(1), bh, res.position);
+  renderTrades(res.trades, capital, agg);
+  setStatus($("runStatus"),
+    `Ran ${bars.length.toLocaleString()} × ${agg}m bars in ${ms.toFixed(0)} ms.`, "ok");
+}
+
+// ------------------------------------------------------------- walk-forward
+function walkForward() {
+  if (!rows1m) return;
+  const { p, costs, agg, capital } = readParams();
+  const GRID = { theta_in: [0.15, 0.25, 0.35], trail_atr: [2.5, 3.5], er_min: [0.15, 0.25] };
+  const bpy = E.barsPerYear(agg);
+  const train = Math.round(30 * 24 * 60 / agg), test = Math.round(10 * 24 * 60 / agg);
+  const t0 = performance.now();
+  const bars = E.aggregate(rows1m, agg, true);
+  const n = bars.length;
+  if (n < train + test) {
+    setStatus($("runStatus"), `Need at least ${Math.ceil((train + test) * agg / 1440)} days of data for walk-forward.`, "err");
+    return;
+  }
+  const frame = E.addAll(bars, p);
+  const combos = [];
+  for (const ti of GRID.theta_in) for (const tr of GRID.trail_atr) for (const em of GRID.er_min)
+    combos.push({ theta_in: ti, trail_atr: tr, er_min: em });
+  const scores = {};
+  for (const cb of combos) {
+    const pp = Object.assign({}, p, cb);
+    scores[JSON.stringify(cb)] = E.computeScore(frame, pp);
+  }
+  const oosRet = [], oosTrades = [], windows = [];
+  for (let start = 0; start + train + test <= n; start += test) {
+    const ranked = [];
+    for (const cb of combos) {
+      const pp = Object.assign({}, p, cb);
+      const sub = { ...frame, n: train };
+      for (const k of ["open","high","low","close","vol_bar","atr"]) sub[k] = frame[k].slice(start, start + train);
+      for (const k of ["mom_fast","mom_slow","breakout","ofi_z","er","trend_ma"]) sub[k] = frame[k].slice(start, start + train);
+      sub.t = frame.t.slice(start, start + train);
+      const r = E.run(sub, pp, costs, agg, scores[JSON.stringify(cb)].slice(start, start + train));
+      const ret = r.bar_returns;
+      let mu = 0, sq = 0;
+      for (const v of ret) { mu += v; sq += v * v; }
+      mu /= ret.length;
+      const sd = Math.sqrt(Math.max(0, (sq - (mu * mu) * ret.length) / ret.length));
+      if (r.trades.length >= 3 && sd > 0) ranked.push([mu / sd, cb]);
+    }
+    if (!ranked.length) { windows.push({ start: start + train, sharpe: [], ret: null, n: 0 }); continue; }
+    ranked.sort((a, b) => b[0] - a[0]);
+    const chosen = ranked.slice(0, 3);
+    const parts = [];
+    let nTradesWin = 0;
+    for (const [sh, cb] of chosen) {
+      const pp = Object.assign({}, p, cb);
+      const sub = { ...frame, n: test };
+      for (const k of ["open","high","low","close","vol_bar","atr","mom_fast","mom_slow","breakout","ofi_z","er","trend_ma"])
+        sub[k] = frame[k].slice(start + train, start + train + test);
+      sub.t = frame.t.slice(start + train, start + train + test);
+      const r = E.run(sub, pp, costs, agg, scores[JSON.stringify(cb)].slice(start + train, start + train + test));
+      parts.push(r.bar_returns);
+      nTradesWin += r.trades.length;
+      for (const t of r.trades) oosTrades.push(t);
+    }
+    const ens = new Float64Array(test);
+    for (let j = 0; j < test; j++) ens[j] = parts.reduce((s, a) => s + a[j], 0) / parts.length;
+    for (const v of ens) oosRet.push(v);
+    windows.push({ start: start + train, sharpe: chosen.map(c => c[0] * Math.sqrt(bpy)),
+                   ret: ens.reduce((a, v) => a * (1 + v), 1) - 1, n: nTradesWin });
+  }
+  // OOS metrics from ensembled returns (legs scaled by 1/top_k for trade stats)
+  const posArr = oosRet.map(r => (r !== 0 ? 1 : 0));
+  const bhRet = [];
+  const firstTest = windows.length ? windows[0].start : 0;
+  for (let i = firstTest + 1; i < firstTest + 1 + oosRet.length; i++)
+    bhRet.push(frame.close[i] / frame.close[i - 1] - 1);
+  const m = E.computeMetrics(oosTrades.map(t => ({ ...t, weight: t.weight / 3, weighted_net: t.weighted_net / 3 })),
+                             oosRet, posArr, [1, 1], agg);
+  m.buy_hold = bhRet.reduce((a, v) => a * (1 + v), 1) - 1;
+  const ms = performance.now() - t0;
+  renderResult(m, capital, "(walk-forward OOS)");
+  const eq = equityOf(oosRet);
+  const bh = equityOf(bhRet);
+  drawChart(eq.slice(1), bh.slice(1), posArr);
+  renderTrades(oosTrades.map(t => ({ ...t, weighted_net: t.weighted_net / 3 })), capital, agg);
+  $("wfPanel").hidden = false;
+  $("wfTable").tBodies[0].innerHTML = windows.map(w =>
+    w.ret === null
+      ? `<tr><td>bar ${w.start}</td><td>—</td><td>skipped</td><td>0</td></tr>`
+      : `<tr><td>bar ${w.start}</td><td>${w.sharpe.map(s => s.toFixed(1)).join(" / ")}</td>` +
+        `<td class="${w.ret >= 0 ? "pos" : "neg"}">${fmtPct(w.ret)}</td><td>${w.n}</td></tr>`
+  ).join("");
+  setStatus($("runStatus"),
+    `Walk-forward over ${windows.length} windows in ${(ms / 1000).toFixed(1)}s — out-of-sample only.`, "ok");
+}
+
+$("fetchBtn").addEventListener("click", fetchKlines);
+$("runBtn").addEventListener("click", runBacktest);
+$("wfBtn").addEventListener("click", walkForward);
+$("resetBtn").addEventListener("click", () => {
+  for (const [id, v] of Object.entries(DEFAULTS)) $(id).value = v;
+});
+$("csvFile").addEventListener("change", ev => {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      rows1m = parseCsv(reader.result);
+      setStatus($("dataStatus"), `Loaded ${rows1m.length.toLocaleString()} × 1m bars from ${file.name}.`, "ok");
+      $("runBtn").disabled = false;
+      $("wfBtn").disabled = false;
+    } catch (e) { setStatus($("dataStatus"), e.message, "err"); }
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>

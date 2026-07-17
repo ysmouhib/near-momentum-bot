@@ -1,0 +1,45 @@
+# Strategy configuration. Secrets (API keys) are NOT stored here -- they are
+# read from the BINANCE_API_KEY / BINANCE_API_SECRET environment variables.
+# Everything below is safe to commit and is what makes a run reproducible.
+
+symbol: NEARUSDT
+base_interval: 1m        # klines are fetched as 1m…
+aggregate_minutes: 60    # …and aggregated to the trading timeframe (see docs/STRATEGY.md §2)
+paper_trading: true      # true = Binance testnet; false = real funds
+testnet_url: https://testnet.binance.vision
+
+strategy:
+  # Momentum (vol-normalised time-series momentum, in bars)
+  mom_fast: 36           # 36h ≈ 1.5 days
+  mom_slow: 120          # 120h ≈ 5 days
+  vol_window: 48         # realised-vol estimation window
+  # Breakout (Donchian position in [-1, 1])
+  bo_window: 48
+  # Order flow (smoothed taker-imbalance z-score)
+  ofi_window: 24
+  # Blend weights
+  w_mom: 0.50
+  w_bo: 0.30
+  w_ofi: 0.20
+  # Regime gates
+  er_window: 48          # Kaufman efficiency-ratio window
+  er_min: 0.20           # below this the market is chop: no trades
+  trend_window: 200      # long SMA filter: only long above it
+  # Hysteresis (the cost-aware no-trade band)
+  theta_in: 0.25
+  theta_out: 0.0
+  # Exits
+  atr_period: 14
+  trail_atr: 3.0         # chandelier stop: peak close - 3*ATR
+  max_hold_bars: 168     # time stop (168h = 1 week)
+  # Volatility-targeted sizing
+  target_vol: 0.40       # annualised vol budget
+  min_weight: 0.05       # skip entries sizing below this
+
+risk:
+  max_notional_frac: 0.95  # live: never deploy more than this of free USDT
+  cooldown_bars: 0
+
+costs:
+  taker_fee: 0.001       # 0.10% Binance spot taker (set 0.00075 if paying in BNB)
+  slippage: 0.0002       # 0.02% assumed per side on market orders
