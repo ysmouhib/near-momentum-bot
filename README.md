@@ -11,6 +11,8 @@ volatility-targeted trend engine with honest validation.
 [![Lint: ruff](https://img.shields.io/badge/lint-ruff-261230)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
+**[🌐 Live site](https://ysmouhib.github.io/near-momentum-bot/) · [▶️ Browser simulator](https://ysmouhib.github.io/near-momentum-bot/simulator.html)** — run the engine on real Binance data with your own parameters, no install, no API key.
+
 > **Not financial advice.** Educational research project. It defaults to the Binance
 > **testnet** (paper trading). See the [disclaimer](#disclaimer).
 
@@ -94,15 +96,14 @@ near-bot walkforward --csv data/klines_1m.csv --grid grid.yaml --top-k 3
 
 ## Try it in the browser
 
-The GitHub Pages site ships a **client-side simulator**
-([`docs/simulator.html`](docs/simulator.html)) that runs the exact engine on real
-Binance history: public 1-minute klines are fetched straight from your browser (no
-account or API key), every parameter is adjustable, and you can run either a
-fixed-config backtest or full **walk-forward validation in-page**. The JavaScript
-engine is pinned to the Python engine by an automated parity check
-(`experiments/parity_check.js`) — identical trades on shared fixtures, verified in
-CI. Where Binance's API is geo-blocked, upload a CSV written by
-`scripts/download_data.py` instead.
+The **[live simulator](https://ysmouhib.github.io/near-momentum-bot/simulator.html)**
+runs the exact engine on real Binance history: public 1-minute klines are fetched
+straight from your browser (no account or API key), every parameter is adjustable,
+and you can run either a fixed-config backtest or full **walk-forward validation
+in-page**. The JavaScript engine ([`docs/engine.js`](docs/engine.js)) is pinned to
+the Python engine by an automated parity check (`experiments/parity_check.js`) —
+identical trades on shared fixtures, verified in CI. Where Binance's API is
+geo-blocked, upload a CSV written by `scripts/download_data.py` instead.
 
 ## Architecture
 
@@ -147,16 +148,6 @@ node experiments/parity_check.js       # JS engine == Python engine
 CI runs the suite and linter on Python 3.10–3.12, plus the engine parity check,
 on every push and pull request.
 
-## Roadmap
-
-- [x] Walk-forward validation with parameter ensembling
-- [x] Volatility-targeted sizing and per-bar MTM equity
-- [x] Regime gates (efficiency ratio + trend filter)
-- [x] Browser walk-forward validation
-- [ ] Multi-symbol portfolio mode with correlation-aware caps
-- [ ] Binance USD-M futures broker for symmetric short signals
-- [ ] Order-book-depth-aware slippage model
-
 ## Disclaimer
 
 For educational purposes only. Nothing here is financial advice. Cryptocurrency
@@ -168,3 +159,4 @@ liability for any losses.
 ## License
 
 [MIT](LICENSE)
+
