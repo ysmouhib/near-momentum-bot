@@ -16,7 +16,7 @@ sample demands.
 [![Lint: ruff](https://img.shields.io/badge/lint-ruff-261230)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**· [▶️ Browser simulator](https://ysmouhib.github.io/near-momentum-bot/simulator.html)** — run the engine on real Binance data with your own parameters, no install, no API key.
+**[🌐 Live site](https://ysmouhib.github.io/near-momentum-bot/) · [▶️ Browser simulator](https://ysmouhib.github.io/near-momentum-bot/simulator.html)** — run the engine on real Binance data with your own parameters, no install, no API key.
 
 > **Not financial advice.** Educational research project. It defaults to the Binance
 > **testnet** (paper trading). See the [disclaimer](#disclaimer).
