@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>near-momentum-bot v2 — a trend engine that survives its fees</title>
-<meta name="description" content="Cost-aware, volatility-targeted trend following on Binance spot. Honest walk-forward validation, browser simulator, MIT licensed.">
+<title>near-momentum-bot v2 — honest validation of a trend engine</title>
+<meta name="description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="near-momentum-bot v2">
-<meta property="og:title" content="A trend engine that survives its fees">
-<meta property="og:description" content="Cost-aware, volatility-targeted trend following on Binance spot. Walk-forward validated: +10.7% OOS, Sharpe 2.84, −7.5% max DD on real data — fees included. Try the browser simulator.">
+<meta property="og:title" content="near-momentum-bot v2 — honest validation of a trend engine">
+<meta property="og:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'. Try the browser simulator.">
 <meta property="og:url" content="https://ysmouhib.github.io/near-momentum-bot/">
 <meta property="og:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="A trend engine that survives its fees">
-<meta name="twitter:description" content="Cost-aware, volatility-targeted trend following on Binance spot. Walk-forward validated on real data — fees included. Try the browser simulator.">
+<meta name="twitter:title" content="near-momentum-bot v2 — honest validation of a trend engine">
+<meta name="twitter:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'.">
 <meta name="twitter:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -42,9 +42,10 @@
   section{padding:44px 0}
   .hero{padding:64px 0 40px}
   .kicker{font:500 12px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
-  h1{font:800 clamp(30px,5vw,52px)/1.06 var(--disp);font-stretch:115%;letter-spacing:-.02em;max-width:16ch}
+  h1{font:800 clamp(30px,5vw,52px)/1.06 var(--disp);font-stretch:115%;letter-spacing:-.02em;max-width:19ch}
   h1 em{font-style:normal;color:var(--teal)}
-  .hero p.lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:64ch}
+  .hero p.lede{margin-top:18px;font-size:18px;color:var(--ink-soft);max-width:66ch}
+  .hero p.lede b{color:var(--ink)}
   .actions{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
   .btn{display:inline-block;border-radius:6px;padding:12px 20px;font:600 14.5px var(--sans);cursor:pointer;text-decoration:none}
   .btn.solid{background:var(--teal);color:#fff}
@@ -60,8 +61,7 @@
   .prose p+p{margin-top:10px}
 
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
-  @media(max-width:840px){.grid2,.grid3{grid-template-columns:1fr}}
+  @media(max-width:840px){.grid2{grid-template-columns:1fr}}
   .card{background:var(--panel);border:1px solid var(--grid);border-radius:10px;padding:18px}
   .card h3{margin-top:0}
   .card p{color:var(--ink-soft);font-size:14px}
@@ -72,6 +72,15 @@
   .res thead th{border-top:0;font:500 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);background:#f6f8f9}
   .pos{color:var(--teal-deep)}.neg{color:var(--clay)}
   .caption{font:400 12px var(--sans);color:var(--ink-soft);margin-top:8px}
+
+  .callout{background:var(--panel);border:1px solid var(--grid);border-left:4px solid var(--teal);border-radius:8px;padding:16px 18px;margin-top:20px;max-width:80ch}
+  .callout p{color:var(--ink);font-size:15px}
+  .callout p+p{margin-top:8px}
+  .callout .lbl{font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--teal);display:block;margin-bottom:8px}
+
+  ul.caveats{margin:16px 0 0;padding-left:20px;max-width:76ch;color:var(--ink-soft)}
+  ul.caveats li{margin-bottom:10px}
+  ul.caveats b{color:var(--ink)}
 
   pre{background:#10181c;color:#d9e2e6;border-radius:10px;padding:16px 18px;font:400 13px/1.7 var(--mono);overflow-x:auto;margin-top:14px}
   pre .c{color:#7d919b}
@@ -87,7 +96,7 @@
   <div class="wrap">
     <a class="brand" href="#">near-momentum-bot <b>v2</b></a>
     <nav class="links" aria-label="Sections">
-      <a href="#results">Results</a>
+      <a href="#results">Validation</a>
       <a href="#method">Methodology</a>
       <a href="#quickstart">Quickstart</a>
       <a class="cta" href="simulator.html">Open the simulator →</a>
@@ -97,13 +106,14 @@
 
 <section class="hero">
   <div class="wrap">
-    <div class="kicker">Binance spot · trend following · cost-aware</div>
-    <h1>A trend engine that <em>survives its fees</em>.</h1>
-    <p class="lede">v1 of this bot was an honest failure: a 4-minute momentum scalper that lost
-    <b>82% out-of-sample</b> on real data — the edge never existed, and 0.24% round-trip costs made
-    sure of the rest. v2 is the ground-up rewrite: a slow, vol-targeted trend engine with a
-    continuous conviction score, regime gates, and walk-forward validation as the only number
-    it believes in.</p>
+    <div class="kicker">Binance spot · backtesting · walk-forward validation</div>
+    <h1>An honest account of what a trend engine <em>can and cannot prove</em>.</h1>
+    <p class="lede">This project exists to demonstrate <b>cost-aware backtesting and walk-forward
+    validation done honestly</b> — including the part where the honest answer is "not
+    distinguishable from noise yet." Its one robust finding: on 91 days of real data, the v1
+    4-minute scalper <b>lost 82% out-of-sample</b> — the edge never survived 0.24% round-trip
+    costs. v2 is the disciplined response: a slower, volatility-targeted trend engine, evaluated
+    with the statistical caution the small sample demands.</p>
     <div class="actions">
       <a class="btn solid" href="simulator.html">Run it on real data, in your browser</a>
       <a class="btn line" href="https://github.com/ysmouhib/near-momentum-bot">Source on GitHub</a>
@@ -112,6 +122,7 @@
       <span class="pill">no API key needed for simulation</span>
       <span class="pill">fees + slippage on every fill</span>
       <span class="pill">walk-forward out-of-sample only</span>
+      <span class="pill">standard errors stated, not hidden</span>
       <span class="pill">MIT licensed</span>
     </p>
   </div>
@@ -119,27 +130,58 @@
 
 <section id="results">
   <div class="wrap">
-    <h2>Results, honestly</h2>
-    <p class="prose">91 days of real NEARUSDT 1-minute data (mid-April → mid-July 2026), aggregated
-    to 60-minute bars, with Binance taker fees (0.10%/side) and slippage (0.02%/side) charged on
-    every fill. The number that matters is the <b>walk-forward out-of-sample</b> row: parameters are
-    re-optimised on rolling 30-day windows and performance is measured only on the unseen days
-    that follow.</p>
+    <h2>Validation discipline, not a performance claim</h2>
+    <p class="prose"><b>Read this as a worked example of honest evaluation, not as evidence that
+    this strategy makes money.</b> The sample is far too small to conclude anything — the most
+    useful thing this page does is show <em>how to see that</em>, rather than hide it.</p>
+    <p class="prose" style="margin-top:10px">Setup: 91 days of real NEARUSDT 1-minute data
+    (mid-April → mid-July 2026), aggregated to 60-minute bars, with Binance taker fees
+    (0.10%/side) and slippage (0.02%/side) charged on every fill. Walk-forward re-optimises a
+    deliberately small grid on rolling 30-day windows and reports <b>only the unseen 10-day
+    windows that follow</b>.</p>
     <table class="res">
-      <thead><tr><th>Configuration</th><th>OOS return</th><th>Sharpe</th><th>Max DD</th><th>Trades</th><th>Win rate</th></tr></thead>
+      <thead><tr><th>Configuration</th><th>OOS return</th><th>Sharpe</th><th>Max DD</th><th>Trades</th></tr></thead>
       <tbody>
-        <tr><td>v1 scalper @ 4m (the old bot)</td><td class="neg">−82.4%</td><td>—</td><td>−82.5%</td><td>714</td><td>23.8%</td></tr>
-        <tr><td>v1 scalper @ 60m (same strategy, slower)</td><td class="neg">−9.4%</td><td>—</td><td>−17.0%</td><td>39</td><td>—</td></tr>
-        <tr><td><b>v2 @ 60m — walk-forward OOS</b></td><td class="pos"><b>+10.7%</b></td><td>+2.84</td><td>−7.5%</td><td>38</td><td>47.4%</td></tr>
-        <tr><td>v2 @ 60m — OOS with <b>2× costs</b> (stress)</td><td class="pos">+13.3%*</td><td>+3.54</td><td>−5.9%</td><td>36</td><td>—</td></tr>
-        <tr><td>v2 @ 60m — ETHUSDT (held-out symbol)</td><td class="pos">+5.8%</td><td>+2.15</td><td>−7.5%</td><td>26</td><td>42%</td></tr>
-        <tr><td>v2 @ 60m — SOLUSDT (held-out symbol)</td><td class="pos">+0.3%</td><td>+0.18</td><td>−5.7%</td><td>35</td><td>29%</td></tr>
+        <tr><td>v1 scalper @ 4m (the old bot)</td><td class="neg">−82.4%</td><td>—</td><td>−82.5%</td><td>714</td></tr>
+        <tr><td>v1 scalper @ 60m (same strategy, slower)</td><td class="neg">−9.4%</td><td>—</td><td>−17.0%</td><td>39</td></tr>
+        <tr><td>v2 @ 60m — walk-forward OOS</td><td class="pos">+10.7%</td><td>+2.84</td><td>−7.5%</td><td>38</td></tr>
+        <tr><td>v2 @ 60m — 2× cost stress</td><td class="pos">+13.3%</td><td>+3.54</td><td>−5.9%</td><td>36</td></tr>
+        <tr><td>v2 @ 60m — ETHUSDT (held-out symbol)</td><td class="pos">+5.8%</td><td>+2.15</td><td>−7.5%</td><td>26</td></tr>
+        <tr><td>v2 @ 60m — SOLUSDT (held-out symbol)</td><td class="pos">+0.3%</td><td>+0.18</td><td>−5.7%</td><td>35</td></tr>
       </tbody>
     </table>
-    <p class="caption">*cost-stress figure from the research run with the top-3 ensemble; see
-    experiments/. Buy &amp; hold over the same OOS windows returned +38.2% with far larger
-    drawdowns — the strategy traded 30% of the time and took on a fraction of the risk. Risk-adjusted,
-    not raw, return is the point. Every number above is reproducible in two commands (see Quickstart).</p>
+    <p class="caption">Read the +10.7% row together with the caveats below — on this sample it is
+    one draw from a wide distribution, not evidence of skill. Every figure is reproducible in two
+    commands (see Quickstart), including the ones that undercut the strategy.</p>
+
+    <h3 style="margin-top:26px">The numbers above are statistically inconclusive, on purpose</h3>
+    <ul class="caveats">
+      <li><b>The trade count is inflated.</b> 38 "trades" are the legs of a top-3 parameter
+      ensemble over the same windows, so they are heavily correlated — the number of
+      <em>independent decisions</em> is closer to ~13. A Sharpe of 2.84 estimated on ~13
+      effective, serially-dependent observations has a standard error wide enough that the
+      <b>95% confidence interval comfortably contains zero</b>.</li>
+      <li><b>The 2× cost stress going <em>up</em> is a warning, not a win.</b> Costs cannot
+      improve any individual trade; the rise from +10.7% to +13.3% means the in-sample optimiser
+      simply selected different parameters under stressed costs — a direct measurement of
+      selection noise, reported instead of buried.</li>
+      <li><b>One market phase.</b> 91 days is a single trending regime for NEAR. ETH (+5.8%) and
+      especially SOL (+0.3% — i.e. nothing) on the same window are the honest counter-evidence,
+      deliberately left in.</li>
+      <li><b>Buy &amp; hold beat it on raw return</b> (+38.2% over the same windows) with far
+      larger drawdowns; the strategy was invested only ~30% of the time.</li>
+    </ul>
+
+    <div class="callout">
+      <span class="lbl">The conclusion actually defended</span>
+      <p>On the only data tested, the v1 scalper is <b>decisively dead</b> (−82%, a robust
+      finding), and v2 is <b>not distinguishable from noise</b> at this sample size. Claiming an
+      edge would need multi-year data, bootstrapped confidence intervals and a deflated Sharpe
+      ratio.</p>
+      <p>The deliverable here is the machinery — and the discipline to reach that conclusion
+      honestly — not the +10.7%.</p>
+    </div>
+
     <figure>
       <img src="img/walkforward_real.png" alt="Walk-forward out-of-sample equity curve on real NEARUSDT data">
       <figcaption>Walk-forward out-of-sample equity, drawdown and return distribution — real
@@ -174,19 +216,21 @@
       <div class="card"><h3>4. Volatility-targeted sizing</h3>
         <p>Position weight = target annualised vol ÷ realised vol, capped at 100%. Quiet markets
         get bigger positions, wild markets smaller ones — risk stays constant across regimes, which
-        is what makes the Sharpe ratio of a trend system meaningful.</p></div>
-      <div class="card"><h3>5. A timeframe where fees are beatable</h3>
+        is what makes risk-adjusted comparisons between periods meaningful.</p></div>
+      <div class="card"><h3>5. A timeframe where costs stop being decisive</h3>
         <p>Costs are fixed per trade; trends scale with time. At 4 minutes the average move is a
         rounding error next to 0.24% round-trip costs; at 60 minutes it isn't. The default grid
         searches slower bars, not faster ones.</p></div>
       <div class="card"><h3>6. Top-k walk-forward ensemble</h3>
         <p>Instead of trading the single best in-sample parameter set (mostly luck), each window
-        trades the top-3 and averages them. On real data the ensemble doubled the OOS trade count
-        while raising OOS Sharpe — selection variance traded away.</p></div>
+        trades the top-3 and averages them — selection variance traded away. On this sample it
+        doubled the OOS trade count while raising OOS Sharpe; the mechanism matters more than
+        the number.</p></div>
     </div>
-    <p class="prose" style="margin-top:18px">Full reasoning, the failure analysis of v1, and the
-    plateau-robustness table are in
-    <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/docs/STRATEGY.md">docs/STRATEGY.md</a>.</p>
+    <p class="prose" style="margin-top:18px">Full reasoning, the failure analysis of v1, the
+    plateau-robustness table and the named statistical gaps are in
+    <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/docs/STRATEGY.md">docs/STRATEGY.md</a>
+    and the <a href="https://github.com/ysmouhib/near-momentum-bot#roadmap--what-would-make-the-numbers-trustworthy">roadmap</a>.</p>
   </div>
 </section>
 
@@ -212,7 +256,7 @@ near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png</pre>
     <figure>
       <img src="img/backtest_real.png" alt="Fixed-config backtest on real NEARUSDT data with position weights">
       <figcaption>Fixed-config backtest with buy &amp; hold comparison and the volatility-targeted
-      position weight over time.</figcaption>
+      position weight over time — shown for the mechanics, not as evidence of edge.</figcaption>
     </figure>
   </div>
 </section>
@@ -221,9 +265,9 @@ near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png</pre>
   <div class="wrap">
     <p><b>Disclaimer.</b> For education and research only — not financial advice. Crypto trading
     carries substantial risk of loss. Simulated results ignore partial fills, order-book depth and
-    latency, and past out-of-sample performance does not guarantee future returns. The defaults are
-    a starting point: revalidate on fresh data before trading, use the testnet first, and never
-    risk money you cannot afford to lose. MIT licensed.</p>
+    latency, and past out-of-sample performance does not guarantee future returns. Nothing here is
+    a performance claim: the stated conclusion is that the v2 results are statistically
+    inconclusive at this sample size. MIT licensed.</p>
   </div>
 </footer>
 </body>
