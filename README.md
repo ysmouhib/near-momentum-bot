@@ -16,6 +16,9 @@ sample demands.
 [![Lint: ruff](https://img.shields.io/badge/lint-ruff-261230)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
+> This repository was published in 2026 and builds on earlier private research;
+> v2 is the first public version.
+
 **[🌐 Live site](https://ysmouhib.github.io/near-momentum-bot/) · [▶️ Browser simulator](https://ysmouhib.github.io/near-momentum-bot/simulator.html)** — run the engine on real Binance data with your own parameters, no install, no API key.
 <p align="center">
   <img src="docs/img/simulator.png" width="960"
