@@ -105,4 +105,33 @@ This is the sample the cell was selected on. The deflated Sharpe charges for the
 
 Next step (c), only after approval: `python experiments/plateau_hunt.py --holdout --center theta_in=0.15 trail_atr=4.0 er_min=0.1` — holdout "viewed in aggregate in e0d6f3c".
 
+---
+
+*Everything below was added on 2026-10-19, after the pre-registered run. Everything above is the unedited generated output of that run.*
+
+## Post-hoc context: selected cell vs buy-and-hold, 2021-2024
+
+> **Post-hoc, descriptive only.** Computed after the pre-registered run (4ecfe2c) by `experiments/plateau_context.py`; not part of the pre-registration and not used for selection or any pass/fail rule.
+
+Same bars, same per-bar accounting. Selected cell: `theta_in=0.15, trail_atr=4, er_min=0.1`. Buy-and-hold = the coin's own close-to-close returns, fully invested; the pooled row rebalances to equal weight every bar.
+
+| | Sharpe: buy-and-hold | Sharpe: selected cell | total return: buy-and-hold | total return: selected cell | max drawdown: buy-and-hold | max drawdown: selected cell | cell exposure | correlation |
+|---|---|---|---|---|---|---|---|---|
+| NEARUSDT | +0.89 | +0.54 | +238% | +62% | -95% | -49% | 38% | +0.59 |
+| ETHUSDT | +0.87 | +0.46 | +355% | +43% | -81% | -41% | 41% | +0.52 |
+| SOLUSDT | +1.58 | +1.50 | +12159% | +434% | -97% | -31% | 39% | +0.56 |
+| Pooled (equal weight) | +1.32 | +1.13 | +2472% | +150% | -89% | -30% | 39% | +0.58 |
+
+Exposure = share of bars with an open position; correlation = between the per-bar returns of the cell and of buy-and-hold.
+
+## Finding
+
+**On NEAR/ETH/SOL over 2021-2024, this engine family's parameter search converges toward market exposure and does not beat buy-and-hold.**
+
+- The pre-registered selection landed on the loosest corner of the grid on all three knobs (lowest entry threshold, weakest chop filter, widest trailing stop): the score rises with time in the market, not with sharper timing.
+- The selected cell failed its pre-registered deflated-Sharpe gate (P(SR > SR*) = 0.69 < 0.95 after charging for 219 configurations). The generated "Overall" line above says it "survives the in-sample tests"; that wording overstates it — its CIs exclude zero, but the DSR gate is not passed.
+- Against buy-and-hold on the same bars it has a lower Sharpe on every symbol (pooled +1.13 vs +1.32) and a far lower total return, and its returns correlate +0.58 with the market's. What it does deliver is a much shallower drawdown (pooled -30% vs -89%) at about 39% exposure — a partially invested version of the same market exposure, which is not evidence of timing skill.
+
+**Decision (2026-10-19): step (c) is not run; the holdout stays sealed.** The holdout [2025-01-01, 2026-10-01) has not been used by any selection and is reserved for a future strategy family. Its status label stands — "viewed in aggregate in e0d6f3c" (the default engine's walk-forward results over those months were reported there) — so a future family should treat it as a viewed, not pristine, holdout.
+
 Not financial advice.

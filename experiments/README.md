@@ -35,6 +35,12 @@ directory.
   the one holdout shot (`--holdout --center ...`) runs only after explicit
   approval. Writes `reports/plateau_hunt.md` + `.csv` (every cell).
 
+- `plateau_context.py` — **post-hoc, descriptive**: the hunt's selected cell
+  next to buy-and-hold on the same 2021-2024 bars (Sharpe, total return, max
+  drawdown, exposure, correlation). Written after the pre-registered run and
+  never used for selection; its table is the labelled context section of
+  `reports/plateau_hunt.md`.
+
 - `make_fixtures.py` / `parity_check.js` — pins the web simulator's JavaScript
   engine (`docs/engine.js`) to the Python engine: identical trades, prices,
   weights and metrics on shared fixture data across several parameter, cost and

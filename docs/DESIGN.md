@@ -1,8 +1,11 @@
 # DESIGN.md — "Trend Rider": v2 engine + human permission layer + risk overlay
 
 Status: **implemented, steps 1–6** (progress and implementation notes in
-§11). The multi-year validation run and the regime sweep on real data have
-not been done yet.
+§11). Real-data results (2021-01 → 2026-09): the validation battery finds
+every block not distinguishable from noise (`reports/validate.md`); the
+pre-registered plateau hunt converged toward market exposure and does not
+beat buy-and-hold (`reports/plateau_hunt.md`, Finding). The holdout
+2025-01 → 2026-09 stays sealed for a future strategy family.
 This document is the implementation contract for hardening the v2 research framework into a
 production single-bot system. It is written to be argued with, in the same
 spirit as `docs/STRATEGY.md`: every claim here is checkable against the repo,

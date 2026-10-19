@@ -97,6 +97,7 @@ src/near_bot/
 tests/              # 137-test pytest suite (see below)
 experiments/        # sweep.py (plateau robustness), regime_sweep.py (value of regime-call accuracy, DESIGN.md §7.4),
                     #   plateau_hunt.py (pre-registered parameter search + gated holdout shot),
+                    #   plateau_context.py (post-hoc buy-and-hold context, never used for selection),
                     #   make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
 docs/               # STRATEGY.md (v2 rationale), DESIGN.md (Trend Rider contract), engine.js, GitHub Pages site

@@ -63,7 +63,11 @@ The engine stays untouched; two layers sit above it (contract:
   dated window per symbol and reports block-bootstrap CIs, a deflated Sharpe that
   charges for every configuration tried, the number of *independent* decisions, and
   a verdict that says "not distinguishable from noise" whenever that is the truth.
-  The multi-year run has not been done yet — no new performance claim is made here.
+  The multi-year run (NEAR/ETH/SOL/BTC, 2021-01 → 2026-09) is done and makes no
+  performance claim: every block is *not distinguishable from noise*
+  ([`reports/validate.md`](reports/validate.md)), and a pre-registered parameter search
+  converged toward market exposure without beating buy-and-hold
+  ([`reports/plateau_hunt.md`](reports/plateau_hunt.md)).
 
 ## Validation discipline, not performance claim
 
@@ -229,10 +233,9 @@ The current results are a proof-of-machinery on a small sample, not evidence of 
 The gap between "interesting" and "believable" is entirely statistical, and named here
 so it isn't hidden:
 
-- [ ] **Multi-year data** across several regimes, with fixed, dated windows so a run
-      is exactly reproducible (not a rolling "last 90 days"). *Machinery done*
-      (`--start/--end` windows, monthly dumps, manifests, gap detection); the
-      multi-year run itself is still to do.
+- [x] **Multi-year data** across several regimes, with fixed, dated windows so a run
+      is exactly reproducible (not a rolling "last 90 days") — 2021-01 → 2026-09,
+      checksum-verified manifests in `data/`; result: not distinguishable from noise.
 - [x] **Bootstrapped confidence intervals** on OOS Sharpe and expectancy, plus a
       **deflated Sharpe ratio** (Bailey–López de Prado) to charge for the number of
       configurations tried — `near-bot validate`.
