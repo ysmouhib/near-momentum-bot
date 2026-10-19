@@ -64,3 +64,53 @@ def test_csv_roundtrip(klines_1m, tmp_path):
     back = data.load_csv(p)
     assert len(back) == len(klines_1m)
     assert pd.api.types.is_datetime64_any_dtype(back["open_time"])
+
+
+def test_find_gaps_detects_hole():
+    ot = pd.date_range("2026-01-01", periods=100, freq="1min")
+    df = pd.DataFrame({"open_time": ot.delete(range(40, 50))})  # 10 missing minutes
+    gaps = data.find_gaps(df)
+    assert len(gaps) == 1
+    gap_start, gap_end, n_missing = gaps[0]
+    assert n_missing == 10
+    assert gap_start == ot[40]
+    assert gap_end == ot[49]
+
+
+def test_find_gaps_ignores_gaps_within_tolerance():
+    ot = pd.date_range("2026-01-01", periods=100, freq="1min")
+    # exactly 5 missing minutes == the default tolerance: not reported
+    df = pd.DataFrame({"open_time": ot.delete(range(10, 15))})
+    assert data.find_gaps(df) == []
+    # ...but it is reported once the tolerance drops below it
+    assert len(data.find_gaps(df, max_gap_minutes=4)) == 1
+
+
+def test_find_gaps_handles_empty_and_single_row():
+    assert data.find_gaps(pd.DataFrame({"open_time": []})) == []
+    one = pd.DataFrame({"open_time": pd.date_range("2026-01-01", periods=1, freq="1min")})
+    assert data.find_gaps(one) == []
+
+
+def test_find_gaps_unsorted_input():
+    ot = pd.date_range("2026-01-01", periods=100, freq="1min")
+    df = pd.DataFrame({"open_time": ot.delete(range(40, 50))})
+    shuffled = df.sample(frac=1, random_state=1).reset_index(drop=True)
+    gaps = data.find_gaps(shuffled)
+    assert len(gaps) == 1 and gaps[0][2] == 10
+
+
+def test_window_gaps_covers_window_edges():
+    # only Jan 10 present inside a [Jan 1, Jan 12) window
+    df = pd.DataFrame({"open_time": pd.date_range("2026-01-10", periods=1440, freq="1min")})
+    gaps = data.window_gaps(df, "2026-01-01", "2026-01-12")
+    assert len(gaps) == 2
+    assert gaps[0] == (pd.Timestamp("2026-01-01"), pd.Timestamp("2026-01-09 23:59"), 9 * 1440)
+    assert gaps[1] == (pd.Timestamp("2026-01-11"), pd.Timestamp("2026-01-11 23:59"), 1440)
+
+
+def test_window_gaps_full_coverage_is_clean():
+    ot = pd.date_range("2026-01-01", periods=3 * 1440, freq="1min")
+    df = pd.DataFrame({"open_time": ot})
+    assert data.window_gaps(df, "2026-01-01", "2026-01-04") == []
+    assert data.window_gaps(df.iloc[:0], "2026-01-01", "2026-01-04") == []

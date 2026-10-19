@@ -103,14 +103,14 @@ git clone https://github.com/ysmouhib/near-momentum-bot.git
 cd near-momentum-bot
 pip install -e ".[dev,plot]"
 
-# 1. Download 90 days of real 1m klines (no API key; Binance public dumps)
-python scripts/download_data.py --symbol NEARUSDT --days 90
+# 1. Download a fixed window of real 1m klines (no API key; Binance public dumps)
+python scripts/download_data.py --start 2026-04-17 --end 2026-07-17
 
 # 2. Fixed-config backtest (optimistic upper bound)
-near-bot backtest --csv data/klines_1m.csv --trades --plot reports/backtest.png
+near-bot backtest --csv data/NEARUSDT_1m_20260417_20260717.csv --trades --plot reports/backtest.png
 
 # 3. Walk-forward validation (the number that actually matters)
-near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png
+near-bot walkforward --csv data/NEARUSDT_1m_20260417_20260717.csv --plot reports/oos.png
 
 # 4. (Optional) paper trade on the testnet
 cp .env.example .env   # paste testnet keys from testnet.binance.vision

@@ -61,12 +61,12 @@ src/near_bot/
 ├── backtest.py     # event-driven loop, hysteresis, vol-target sizing, exact per-bar MTM accounting, metrics
 ├── walkforward.py  # rolling train/test windows, Sharpe selection, top-k ensemble, optional embargo; DEFAULT_GRID (12 combos, deliberately small)
 ├── report.py       # matplotlib equity/drawdown/exposure/trade plots (optional dep)
-├── dump_client.py  # data.binance.vision public daily zips (no key, no geo-block)
+├── dump_client.py  # data.binance.vision public daily+monthly zips (no key, no geo-block); fetch_range + manifest
 ├── broker.py       # python-binance spot wrapper: paginated klines, LOT_SIZE/min-notional, long-only market orders
 ├── executor.py     # paper/live loop reusing the backtester's score + sizing + exit rules
 └── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, paper, live
 
-tests/              # 32-test pytest suite (see below)
+tests/              # 46-test pytest suite (see below)
 experiments/        # sweep.py (plateau robustness), make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
 docs/               # STRATEGY.md (the design rationale), engine.js, static GitHub Pages site (index.html, simulator.html)
@@ -79,8 +79,9 @@ reports/            # generated plots (gitignored)
 ## Common commands
 
 ```bash
-# Data: 90 days of 1m klines from public dumps (no API key; --source api uses REST)
-python scripts/download_data.py --symbol NEARUSDT --days 90
+# Data: a fixed window of 1m klines from public dumps (no API key; --source api uses REST)
+# writes data/NEARUSDT_1m_20230101_20260101.csv + a .manifest.json sidecar
+python scripts/download_data.py --symbols NEARUSDT --start 2023-01-01 --end 2026-01-01
 
 # Fixed-config backtest (optimistic upper bound)
 near-bot backtest --csv data/klines_1m.csv --trades --plot reports/backtest.png
@@ -107,7 +108,7 @@ python experiments/sweep.py --csv data/klines_1m.csv
 ## Testing
 
 ```bash
-pytest -q                                # 32 tests, all offline (synthetic fixtures)
+pytest -q                                # 46 tests, all offline (synthetic fixtures)
 ruff check src tests                     # lint (no ruff config pinned; see note below)
 python experiments/make_fixtures.py      # regenerate parity fixtures (writes /tmp/*.json)
 node experiments/parity_check.js         # JS engine == Python engine (needs Node.js)
@@ -149,8 +150,8 @@ reproduction (the check compares to 1e-9 on prices, 1e-6 on metrics).
 installed unpinned. Newer ruff versions (e.g. 0.17.x) flag extra default rules
 (I001 import sorting, ISC004 implicit string concatenation, SIM117, UP037,
 TRY401) that the codebase written against ruff 0.6 does not satisfy. As of
-this writing `ruff check src tests` reports 8 such stylistic findings while
-`pytest -q` passes 32/32. Decide consciously whether to fix, ignore, or pin
+this writing `ruff check src tests` reports 7 such stylistic findings while
+`pytest -q` passes 46/46. Decide consciously whether to fix, ignore, or pin
 the rule set before treating lint failures as blockers.
 
 ## Code style
@@ -202,3 +203,5 @@ the rule set before treating lint failures as blockers.
 branch `main`, folder `/docs` — serves `index.html` + `simulator.html`, where
 the simulator fetches Binance public klines in the visitor's browser with a
 CSV-upload fallback), and an optional paper-trading instance on the testnet.
+
+

@@ -88,6 +88,23 @@ class CostParams:
 
 
 @dataclass
+class DataParams:
+    """Fixed download/validation windows.
+
+    A rolling "last N days" window makes every run a *different* dataset, so
+    results drift even when nothing changed. A fixed [start, end) window
+    means the same command reproduces the same bytes, the same bars, and the
+    same numbers — the property every validation claim stands on.
+    """
+
+    symbols: list[str] = field(
+        default_factory=lambda: ["NEARUSDT", "ETHUSDT", "SOLUSDT", "BTCUSDT"])
+    start: str = "2023-01-01"
+    end: str = ""            # empty = latest complete UTC day
+    dir: str = "data"
+
+
+@dataclass
 class Config:
     symbol: str = "NEARUSDT"
     base_interval: str = "1m"       # Binance klines are fetched as 1m…
@@ -99,6 +116,7 @@ class Config:
     strategy: ScoreParams = field(default_factory=ScoreParams)
     risk: RiskParams = field(default_factory=RiskParams)
     costs: CostParams = field(default_factory=CostParams)
+    data: DataParams = field(default_factory=DataParams)
 
     # Secrets — populated from the environment, never from YAML.
     api_key: str = field(default="", repr=False)
@@ -106,19 +124,20 @@ class Config:
 
     @classmethod
     def load(cls, path: str | Path = "config.yaml") -> "Config":
-        data: dict[str, Any] = {}
+        raw: dict[str, Any] = {}
         p = Path(path)
         if p.exists():
             if yaml is None:
                 raise RuntimeError("PyYAML is required to read config.yaml")
             with p.open() as fh:
-                data = yaml.safe_load(fh) or {}
+                raw = yaml.safe_load(fh) or {}
 
-        strategy = ScoreParams(**data.pop("strategy", {}) or {})
-        risk = RiskParams(**data.pop("risk", {}) or {})
-        costs = CostParams(**data.pop("costs", {}) or {})
+        strategy = ScoreParams(**raw.pop("strategy", {}) or {})
+        risk = RiskParams(**raw.pop("risk", {}) or {})
+        costs = CostParams(**raw.pop("costs", {}) or {})
+        data_params = DataParams(**raw.pop("data", {}) or {})
 
-        cfg = cls(strategy=strategy, risk=risk, costs=costs, **data)
+        cfg = cls(strategy=strategy, risk=risk, costs=costs, data=data_params, **raw)
         cfg.api_key = os.getenv("BINANCE_API_KEY", "")
         cfg.api_secret = os.getenv("BINANCE_API_SECRET", "")
         return cfg

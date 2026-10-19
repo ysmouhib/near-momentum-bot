@@ -8,6 +8,12 @@ aggregate_minutes: 60    # …and aggregated to the trading timeframe (see docs/
 paper_trading: true      # true = Binance testnet; false = real funds
 testnet_url: https://testnet.binance.vision
 
+data:
+  symbols: [NEARUSDT, ETHUSDT, SOLUSDT, BTCUSDT]   # download + validation universe
+  start: "2023-01-01"    # fixed window, inclusive
+  end: ""                # exclusive; empty = latest complete UTC day
+  dir: data
+
 strategy:
   # Momentum (vol-normalised time-series momentum, in bars)
   mom_fast: 36           # 36h ≈ 1.5 days

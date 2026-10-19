@@ -11,6 +11,12 @@ Two ways to get 1-minute klines without an API key:
 Aggregation detail that matters: the *most recent* aggregated bar is usually
 incomplete (fewer than N one-minute bars). Trading on an unfinished bar is a
 classic look-ahead bug, so aggregation can drop it.
+
+``find_gaps`` is the integrity check for downloaded coverage: over multi-year
+windows exchange maintenance and unpublished days *will* punch holes in the
+data, and the only thing worse than a hole is a hole nobody looked for.
+``window_gaps`` adds the edges of the requested window, which ``find_gaps``
+cannot bracket on its own.
 """
 
 from __future__ import annotations
@@ -115,3 +121,53 @@ def load_csv(path: str | Path) -> pd.DataFrame:
 def save_csv(df: pd.DataFrame, path: str | Path) -> None:
     Path(path).parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=False)
+
+
+def find_gaps(df: pd.DataFrame, freq_minutes: int = 1,
+              max_gap_minutes: int = 5) -> list[tuple[pd.Timestamp, pd.Timestamp, int]]:
+    """Report holes in ``open_time`` coverage larger than ``max_gap_minutes``.
+
+    Returns one ``(gap_start, gap_end, n_missing_bars)`` tuple per hole, where
+    gap_start/gap_end are the open_times of the first and last *missing* bars
+    and n_missing_bars is how many ``freq_minutes`` bars are absent between
+    the two neighbours that bracket the hole. A hole of exactly
+    ``max_gap_minutes`` is tolerated (not reported); anything larger is.
+    """
+    if len(df) < 2:
+        return []
+    ts = df["open_time"].sort_values().reset_index(drop=True)
+    step = pd.Timedelta(minutes=freq_minutes)
+    tolerance = pd.Timedelta(minutes=max_gap_minutes)
+    gaps = []
+    for i in range(1, len(ts)):
+        missing = ts.iloc[i] - ts.iloc[i - 1] - step
+        if missing > tolerance:
+            gaps.append((ts.iloc[i - 1] + step, ts.iloc[i] - step,
+                         int(missing / step)))
+    return gaps
+
+
+def window_gaps(df: pd.DataFrame, start, end, freq_minutes: int = 1,
+                max_gap_minutes: int = 5) -> list[tuple[pd.Timestamp, pd.Timestamp, int]]:
+    """``find_gaps`` plus the edges of the requested [start, end) window.
+
+    find_gaps only sees holes *between* observed bars; unpublished days at
+    either end of the window leave no bracketing bar, so a caller that knows
+    what it asked for checks the observed coverage against the request.
+    ``start``/``end`` accept anything pd.Timestamp parses (dates or strings);
+    ``end`` is exclusive, matching the download commands.
+    """
+    gaps = find_gaps(df, freq_minutes=freq_minutes, max_gap_minutes=max_gap_minutes)
+    if len(df) == 0:
+        return gaps
+    step = pd.Timedelta(minutes=freq_minutes)
+    tolerance = pd.Timedelta(minutes=max_gap_minutes)
+    first = df["open_time"].min()
+    last = df["open_time"].max()
+    lo = pd.Timestamp(start)
+    hi = pd.Timestamp(end) - step  # last bar the window should contain
+    if first - lo > tolerance:
+        gaps.append((lo, first - step, int((first - lo) / step)))
+    if hi - last > tolerance:
+        gaps.append((last + step, hi, int((hi - last) / step)))
+    return sorted(gaps)

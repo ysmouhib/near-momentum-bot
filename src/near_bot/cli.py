@@ -13,6 +13,7 @@ live             Run the live loop against real Binance (guarded prompt).
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import logging
 import sys
 
@@ -34,6 +35,42 @@ def _load_bars(cfg: Config, csv_path: str):
     return data.aggregate(df_1m, cfg.aggregate_minutes, drop_incomplete=True)
 
 
+def _day_ms(d: dt.date) -> int:
+    return int(dt.datetime.combine(d, dt.time.min, tzinfo=dt.timezone.utc).timestamp() * 1000)
+
+
+def _fetch_api_window(symbol: str, start: dt.date, end: dt.date):
+    """Paginated /api/v3/klines over [start, end) — the --source api path.
+
+    The dumps path is preferred: the REST endpoint is geo-blocked in some
+    regions and needs one request per 1000 minutes. No manifest in this mode.
+    """
+    import time
+
+    import pandas as pd
+    import requests
+
+    end_ms = _day_ms(end)
+    cursor, rows = _day_ms(start), []
+    while cursor < end_ms:
+        resp = requests.get(
+            "https://api.binance.com/api/v3/klines",
+            params={"symbol": symbol, "interval": "1m",
+                    "startTime": cursor, "endTime": end_ms, "limit": 1000},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        batch = resp.json()
+        if not batch:
+            break
+        rows.extend(batch)
+        cursor = batch[-1][6] + 1
+        time.sleep(0.2)
+    if not rows:
+        return pd.DataFrame()
+    return data.klines_to_df(rows)
+
+
 def cmd_test_connection(cfg: Config, args):
     from .broker import Broker
 
@@ -50,19 +87,53 @@ def cmd_test_connection(cfg: Config, args):
 
 
 def cmd_download(cfg: Config, args):
-    if args.source == "dumps":
-        from . import dump_client
+    import json
+    from pathlib import Path
 
-        df = dump_client.fetch_daily(cfg.symbol, args.days)
-    else:
-        from .broker import Broker
+    symbols = args.symbols or [cfg.symbol]
+    start = dt.date.fromisoformat(args.start or cfg.data.start)
+    end_str = args.end or cfg.data.end
+    end = (dt.date.fromisoformat(end_str) if end_str
+           else dt.datetime.now(dt.timezone.utc).date())
+    if end <= start:
+        print(f"Empty window: start={start} end={end}", file=sys.stderr)
+        return 2
+    tag = f"{start:%Y%m%d}_{end:%Y%m%d}"
+    rc = 0
+    for symbol in symbols:
+        print(f"Fetching {symbol} 1m klines [{start}, {end}) via {args.source} ...")
+        manifest = None
+        if args.source == "dumps":
+            from . import dump_client
 
-        broker = Broker(cfg).connect()
-        klines = broker.get_klines_history(cfg.base_interval, args.days * 1440)
-        df = data.klines_to_df(klines)
-    data.save_csv(df, args.out)
-    print(f"Saved {len(df)} 1m klines to {args.out}")
-    return 0
+            df, manifest = dump_client.fetch_range(symbol, start, end)
+        else:
+            df = _fetch_api_window(symbol, start, end)
+        if df.empty:
+            print(f"{symbol}: no data returned.", file=sys.stderr)
+            rc = 1
+            continue
+        out = Path(args.out_dir or cfg.data.dir) / f"{symbol}_1m_{tag}.csv"
+        data.save_csv(df, out)
+        print(f"Saved {len(df):,} 1m klines to {out}")
+        if manifest is not None:
+            mpath = out.with_suffix(".manifest.json")
+            with mpath.open("w") as fh:
+                json.dump(manifest, fh, indent=2)
+            print(f"Manifest: {mpath} ({len(manifest['files'])} files, "
+                  f"{len(manifest['missing_days'])} missing days, "
+                  f"{len(manifest['missing_months'])} missing months)")
+        gaps = data.window_gaps(df, start, end)
+        if gaps:
+            print(f"{symbol}: {len(gaps)} gap(s) over 5 minutes:")
+            for gap_start, gap_end, n in gaps:
+                print(f"  {gap_start} .. {gap_end}  ({n:,} missing bars)")
+        big = [g for g in gaps if g[2] > 1440]
+        if big and not args.allow_gaps:
+            print(f"{symbol}: {len(big)} gap(s) exceed 1 day -- dataset incomplete "
+                  f"(re-run with --allow-gaps to accept).", file=sys.stderr)
+            rc = 1
+    return rc
 
 
 def cmd_backtest(cfg: Config, args):
@@ -156,9 +227,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("test-connection", help="verify API keys")
 
-    d = sub.add_parser("download", help="fetch and save 1m klines")
-    d.add_argument("--days", type=int, default=30)
-    d.add_argument("--out", default="data/klines_1m.csv")
+    d = sub.add_parser("download", help="fetch and save 1m klines over a fixed window")
+    d.add_argument("--symbols", nargs="+", default=None,
+                   help="default: the config symbol")
+    d.add_argument("--start", default=None, metavar="YYYY-MM-DD",
+                   help="window start, inclusive (default: data.start from config)")
+    d.add_argument("--end", default=None, metavar="YYYY-MM-DD",
+                   help="window end, exclusive (default: data.end, or the latest "
+                        "complete UTC day)")
+    d.add_argument("--out-dir", default=None, help="default: data.dir from config")
+    d.add_argument("--allow-gaps", action="store_true",
+                   help="accept gaps longer than 1 day instead of failing")
     d.add_argument("--source", choices=["api", "dumps"], default="dumps",
                    help="'dumps' uses data.binance.vision (no key, no geo-block); "
                         "'api' uses the REST API")

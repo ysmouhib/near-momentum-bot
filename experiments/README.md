@@ -8,8 +8,8 @@ directory.
   worth keeping sits on a *plateau*, not a spike. Run on real data:
 
   ```bash
-  python scripts/download_data.py --symbol NEARUSDT --days 90
-  python experiments/sweep.py --csv data/klines_1m.csv
+  python scripts/download_data.py --start 2026-04-17 --end 2026-07-17
+  python experiments/sweep.py --csv data/NEARUSDT_1m_20260417_20260717.csv
   ```
 
 - `make_fixtures.py` / `parity_check.js` — pins the web simulator's JavaScript
