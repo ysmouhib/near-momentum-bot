@@ -75,18 +75,18 @@ def kurtosis(x: np.ndarray) -> float:
 
 def _block_resample(x: np.ndarray, block: int, rng: np.random.Generator) -> np.ndarray:
     """Circular block bootstrap: wrap-around blocks preserve short-range
-    autocorrelation while staying unbiased for the sample mean."""
+    autocorrelation while staying unbiased for the sample mean.
+
+    Vectorised: one draw per block start, the last block truncated to fit.
+    The block starts come from a single ``rng.integers(..., size=k)`` call,
+    which consumes the generator exactly like k scalar draws, so seeded CIs
+    are unchanged by the vectorisation.
+    """
     n = len(x)
     block = max(1, min(block, n))
-    out = np.empty(n)
-    filled = 0
-    while filled < n:
-        start = int(rng.integers(0, n))
-        take = min(block, n - filled)
-        idx = (start + np.arange(take)) % n
-        out[filled:filled + take] = x[idx]
-        filled += take
-    return out
+    starts = rng.integers(0, n, size=-(-n // block))
+    idx = (starts[:, None] + np.arange(block)).ravel()[:n] % n
+    return x[idx]
 
 
 def bootstrap_ci(x: np.ndarray, stat_fn, n_boot: int = 10000, block: int = 168,
@@ -121,6 +121,23 @@ def sharpe_stat(bar_minutes: int):
 
 def total_return_stat(x: np.ndarray) -> float:
     return float(np.prod(1.0 + x) - 1.0)
+
+
+def ann_return_stat(bar_minutes: int):
+    """Geometric annualised-return closure (log space: no overflow on long runs)."""
+    bpy = 365.0 * 24.0 * 60.0 / bar_minutes
+
+    def _f(x: np.ndarray) -> float:
+        growth = np.log1p(x).sum()
+        return float(np.expm1(growth * bpy / len(x))) if len(x) else 0.0
+
+    return _f
+
+
+def max_drawdown_stat(x: np.ndarray) -> float:
+    """Deepest peak-to-trough loss of the compounded path (<= 0)."""
+    equity = np.cumprod(1.0 + x)
+    return float((equity / np.maximum.accumulate(equity) - 1.0).min()) if len(x) else 0.0
 
 
 def mean_stat(x: np.ndarray) -> float:

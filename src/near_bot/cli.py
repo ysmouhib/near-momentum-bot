@@ -6,6 +6,7 @@ test-connection  Verify API keys and print account / symbol info.
 download         Fetch 1m klines to CSV (REST API or data.binance.vision dumps).
 backtest         Run the strategy over a CSV of 1-minute klines.
 walkforward      Optimise on rolling in-sample windows, report out-of-sample.
+validate         Multi-symbol battery: bootstrap CIs, deflated Sharpe, N_eff, verdict.
 arm / disarm     The human permission switch (journaled, --note required).
 journal          list / report — the human's measured regime-call accuracy.
 status           Overlay state + market regime context (decision support).
@@ -197,6 +198,106 @@ def cmd_walkforward(cfg: Config, args):
             print(f"\nSaved plot to {out}")
         else:
             print("\nNo out-of-sample trading; nothing to plot.")
+    return 0
+
+
+def _window_spec(text: str) -> tuple[int, int]:
+    """argparse type for ``TRAIN_DAYS:TEST_DAYS`` walk-forward variants."""
+    try:
+        train, test = (int(x) for x in text.split(":"))
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"expected TRAIN_DAYS:TEST_DAYS (e.g. 90:30), got {text!r}") from None
+    if train <= 0 or test <= 0:
+        raise argparse.ArgumentTypeError("window days must be positive")
+    return train, test
+
+
+def cmd_validate(cfg: Config, args):
+    import importlib.util
+    import math
+    from pathlib import Path
+
+    from . import stats, validate
+    from . import walkforward as wf
+
+    v = cfg.validation
+    symbols = args.symbols or cfg.data.symbols
+    start = args.start or cfg.data.start
+    end = args.end if args.end is not None else cfg.data.end
+    tag, found, missing = validate.locate_csvs(
+        symbols, args.data_dir or cfg.data.dir, start, end)
+    if not found:
+        print(f"No dated-window CSVs for {', '.join(symbols)} from {start} in "
+              f"{args.data_dir or cfg.data.dir}. Run: near-bot download --symbols "
+              f"{' '.join(symbols)} --start {start}" + (f" --end {end}" if end else ""),
+              file=sys.stderr)
+        return 1
+
+    # Both window variants run and both are reported (DESIGN.md §7.1).
+    variants = args.windows or list(dict.fromkeys([(v.train_days, v.test_days), (30, 10)]))
+    top_k = args.top_k or v.top_k
+    n_boot = args.n_boot or v.bootstrap_reps
+    block = args.block or v.bootstrap_block_bars
+    overlay = cfg.overlay if args.overlay else None
+    out_path = Path(args.out)
+    plots = not args.no_plots and importlib.util.find_spec("matplotlib") is not None
+    bars_per_day = 1440 // cfg.aggregate_minutes
+    bars_by_symbol = {s: _load_bars(cfg, str(p)) for s, p in found.items()}
+
+    batteries = []
+    for train_d, test_d in variants:
+        label = f"train {train_d}d / test {test_d}d"
+        print(f"Validating {label} over {', '.join(found)} ...")
+        battery = validate.run_battery(
+            bars_by_symbol, cfg, train_bars=train_d * bars_per_day,
+            test_bars=test_d * bars_per_day, top_k=top_k, n_boot=n_boot,
+            block=block, overlay=overlay)
+        if plots:
+            from . import report
+
+            for sym, res in battery["results"].items():
+                if len(res.oos_returns):
+                    name = f"validate_{sym}_{train_d}d{test_d}d.png"
+                    report.plot_equity(res.oos_equity(), res.oos_metrics,
+                                       out_path.parent / name,
+                                       title=f"{sym} walk-forward OOS ({label})")
+                    battery["symbols"][sym]["plot"] = name
+        batteries.append((label, battery))
+
+    p = cfg.strategy
+    n_cells = math.prod(len(vals) for vals in wf.DEFAULT_GRID.values())
+    header = [
+        (f"- Data window: `{tag}` (start inclusive, end exclusive), "
+         f"{cfg.aggregate_minutes}m bars aggregated from 1m klines"),
+        f"- Symbols: {', '.join(found)}",
+        (f"- Engine: walk-forward, Sharpe selection over {n_cells} grid cells, "
+         f"top-{top_k} ensemble; risk overlay "
+         f"{'ON' if overlay is not None else 'OFF (pure engine)'}"),
+        (f"- Costs: taker fee {cfg.costs.taker_fee:.3%} + slippage "
+         f"{cfg.costs.slippage:.3%} per side"),
+        (f"- Bootstrap: {n_boot:,} circular-block resamples, block {block} bars, "
+         f"seed 7, 95% percentile CIs"),
+        (f"- Deflated Sharpe: trials ledger stats.TRIALS_TRIED = {stats.TRIALS_TRIED} "
+         f"(charged as max(ledger, traded windows x grid cells))"),
+        (f"- BTC regime: chop if ER({p.er_window}) < {p.er_min}, else up/down vs "
+         f"SMA({p.trend_window}); label lagged one bar; descriptive only, never a signal"),
+    ]
+    if missing:
+        header.append("- **Missing data (skipped, not silently): " + ", ".join(
+            f"{s} (`{path}`)" for s, path in missing.items()) + "**")
+    if not plots:
+        header.append("- Plots: skipped" + (" (--no-plots)" if args.no_plots else
+                                           " (matplotlib not installed)"))
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(validate.render_report(batteries, header, production=cfg.symbol),
+                        encoding="utf-8")
+    print()
+    print("\n".join(validate.verdict_lines(batteries, production=cfg.symbol)))
+    if missing:
+        print(f"\nMissing data (skipped): {', '.join(missing)}")
+    print(f"\nFull report: {out_path}")
     return 0
 
 
@@ -409,6 +510,34 @@ def build_parser() -> argparse.ArgumentParser:
     w.add_argument("--overlay", action="store_true",
                    help="validate with the risk overlay active (the production posture)")
 
+    val = sub.add_parser("validate", help="validation battery: multi-symbol walk-forward, "
+                                          "bootstrap CIs, deflated Sharpe, N_eff, verdict")
+    val.add_argument("--symbols", nargs="+", default=None,
+                     help="default: data.symbols from config (BTC = context stream)")
+    val.add_argument("--start", default=None, metavar="YYYY-MM-DD",
+                     help="window start, inclusive (default: data.start)")
+    val.add_argument("--end", default=None, metavar="YYYY-MM-DD",
+                     help="window end, exclusive (default: data.end, or the newest "
+                          "downloaded window from --start)")
+    val.add_argument("--data-dir", default=None, help="default: data.dir from config")
+    val.add_argument("--windows", nargs="+", type=_window_spec, default=None,
+                     metavar="TRAIN:TEST",
+                     help="walk-forward variants in days (default: validation."
+                          "train_days:test_days and 30:10 -- both run, both reported)")
+    val.add_argument("--top-k", type=int, default=None,
+                     help="ensemble size (default: validation.top_k)")
+    val.add_argument("--n-boot", type=int, default=None,
+                     help="bootstrap resamples (default: validation.bootstrap_reps)")
+    val.add_argument("--block", type=int, default=None,
+                     help="bootstrap block length in bars "
+                          "(default: validation.bootstrap_block_bars)")
+    val.add_argument("--overlay", action="store_true",
+                     help="validate with the risk overlay active (default off, "
+                          "as for backtest/walkforward)")
+    val.add_argument("--out", default="reports/validate.md",
+                     help="markdown report path; plots are written next to it")
+    val.add_argument("--no-plots", action="store_true", help="skip the equity plots")
+
     p = sub.add_parser("paper", help="run on testnet")
     p.add_argument("--poll", type=int, default=30)
 
@@ -449,6 +578,7 @@ def main(argv=None) -> int:
         "download": cmd_download,
         "backtest": cmd_backtest,
         "walkforward": cmd_walkforward,
+        "validate": cmd_validate,
         "paper": cmd_paper,
         "live": cmd_live,
         "arm": cmd_arm,

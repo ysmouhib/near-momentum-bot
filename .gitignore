@@ -10,5 +10,8 @@ venv/
 .pytest_cache/
 .ruff_cache/
 reports/
+# journal.csv + overlay_state.json: operational, never committed, but BACK IT UP
+# (losing the journal resets the human's measured track record — DESIGN.md §6.1)
+state/
 data/*.csv
 !data/.gitkeep

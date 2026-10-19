@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 
 from . import backtest as bt
-from . import indicators
+from . import indicators, stats
 from . import score as score_mod
 
 # Deliberately small: every added cell in the grid is another lottery ticket
@@ -60,6 +60,11 @@ class WindowResult:
     in_sample_sharpe: list[float] = field(default_factory=list)
     out_metrics: dict = field(default_factory=dict)
     note: str = ""
+    # Per-window OOS ensemble returns (indexed by bar) for the bootstrap, and
+    # the IS Sharpe of *every* eligible combo — each one is a trial, and the
+    # deflated Sharpe's variance term must see the losers, not just the picks.
+    oos_returns: pd.Series | None = None
+    trial_sharpes: list[float] = field(default_factory=list)
 
 
 @dataclass
@@ -68,7 +73,13 @@ class WalkForwardResult:
     oos_returns: pd.Series = field(default_factory=lambda: pd.Series(dtype=float))
     oos_trades: list[bt.Trade] = field(default_factory=list)
     oos_metrics: dict = field(default_factory=dict)
+    n_combos: int = 0       # grid cells evaluated per window (trials per selection)
     _bar_minutes: int = 60  # for annualising the per-window IS Sharpe display
+
+    @property
+    def n_eff(self) -> int:
+        """Independent OOS decisions: overlapping ensemble legs count once."""
+        return stats.decision_clusters(self.oos_trades).n_eff
 
     def oos_equity(self) -> pd.Series:
         return pd.Series(np.cumprod(1.0 + self.oos_returns.to_numpy()), name="equity")
@@ -83,7 +94,8 @@ class WalkForwardResult:
         m = self.oos_metrics
         if m.get("n_trades", 0) > 0:
             lines += [
-                f"OOS trades       : {m['n_trades']}",
+                (f"OOS trades       : {m['n_trades']} "
+                 f"(independent decisions N_eff = {self.n_eff})"),
                 f"OOS win rate     : {m['win_rate']:.1%}",
                 f"OOS expectancy   : {m['expectancy_weighted']:+.4%} weighted "
                 f"(gross {m['expectancy_gross']:+.4%}, drag {m['cost_drag']:.4%})",
@@ -188,6 +200,7 @@ def run(
 
     result = WalkForwardResult()
     result._bar_minutes = cfg.aggregate_minutes
+    result.n_combos = len(_combos(grid))
     oos_parts: list[pd.Series] = []
     bh_parts: list[np.ndarray] = []
     close_arr = bars["close"].to_numpy(dtype=float)
@@ -219,13 +232,15 @@ def run(
             parts.append(oos.bar_returns.to_numpy())
             trades.extend(oos.trades)
         ens = np.mean(parts, axis=0)
-        oos_parts.append(pd.Series(ens, index=range(te[0], te[1])))
+        window_oos = pd.Series(ens, index=range(te[0], te[1]))
+        oos_parts.append(window_oos)
         bh_parts.append(close_arr[te[0]: te[1]] / close_arr[te[0] - 1: te[1] - 1] - 1.0)
 
         out_metrics = bt.metrics_from_returns(pd.Series(ens), cfg.aggregate_minutes)
         out_metrics["n_trades"] = len(trades)
         result.windows.append(WindowResult(
-            tr, te, [c for _, c in chosen], [s for s, _ in chosen], out_metrics))
+            tr, te, [c for _, c in chosen], [s for s, _ in chosen], out_metrics,
+            oos_returns=window_oos, trial_sharpes=[s for s, _ in ranked]))
         result.oos_trades.extend(trades)
         start += step
 
