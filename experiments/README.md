@@ -12,6 +12,20 @@ directory.
   python experiments/sweep.py --csv data/NEARUSDT_1m_20260417_20260717.csv
   ```
 
+- `regime_sweep.py` — what is a human regime call *worth*? (docs/DESIGN.md §7.4)
+  Labels each walk-forward OOS window good/bad by realised engine P&L, draws
+  seeded synthetic humans who make the right call with probability p, runs the
+  full system (engine + risk overlay, transition cooldown included) under every
+  schedule, and fits the empirical break-even accuracy against the arithmetic,
+  the design's L/(W+L) formula, 40% and the brief's 56% — a plumbing check as
+  much as a measurement. The labels are clairvoyant by construction: it prices
+  accuracy, it does not certify that anyone has it. Run on real data:
+
+  ```bash
+  python scripts/download_data.py --start 2023-01-01 --end 2026-01-01
+  python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
+  ```
+
 - `make_fixtures.py` / `parity_check.js` — pins the web simulator's JavaScript
   engine (`docs/engine.js`) to the Python engine: identical trades, prices,
   weights and metrics on shared fixture data across several parameter, cost and

@@ -18,7 +18,7 @@ gh repo create ysmouhib/near-momentum-bot --public --source=. --push
 #   git push -u origin main
 ```
 
-CI (`.github/workflows/ci.yml`) runs ruff (pinned to 0.17.1), the 118-test suite,
+CI (`.github/workflows/ci.yml`) runs ruff (pinned to 0.17.1), the 123-test suite,
 and the JS/Python engine parity check on Python 3.10–3.12 automatically on the
 first push.
 

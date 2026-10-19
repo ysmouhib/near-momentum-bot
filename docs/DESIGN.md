@@ -1,7 +1,8 @@
 # DESIGN.md — "Trend Rider": v2 engine + human permission layer + risk overlay
 
-Status: **implemented through step 5 except the regime sweep** (progress per
-step in §11; the multi-year validation run itself has not been done yet).
+Status: **implemented, steps 1–6** (progress and implementation notes in
+§11). The multi-year validation run and the regime sweep on real data have
+not been done yet.
 This document is the implementation contract for hardening the v2 research framework into a
 production single-bot system. It is written to be argued with, in the same
 spirit as `docs/STRATEGY.md`: every claim here is checkable against the repo,
@@ -660,7 +661,7 @@ Order (each step shippable and green on its own):
 3. `overlay.py` + `backtest.py` overlay path + hand-computed tests. — *done*
 4. Executor integration + restart reconciliation. — *done*
 5. `near-bot validate` battery (multi-year, multi-symbol, bootstrap, DSR,
-   N_eff) and `experiments/regime_sweep.py`. — *validate done; regime sweep pending*
+   N_eff) and `experiments/regime_sweep.py`. — *done*
 6. Docs sweep (AGENTS.md, README, DEPLOY) and the simulator's
    "signal engine only" note. — *done*
 
@@ -675,6 +676,13 @@ Implementation notes (decisions the text above left open):
 - **`armed` edges are human calls in the backtester.** False→True runs
   `overlay.arm` (cooldown, lifts STOPPED) and True→False `overlay.disarm`;
   `armed_before` gives the permission just before the first bar.
+- **Regime sweep replays, it does not re-optimise.** The walk-forward
+  selection is fixed from one engine-only run (the human never changes the
+  parameters the engine trades) and the overlay restarts per OOS window, as
+  in `walkforward.run(overlay=...)`. Each window's outcome then depends only
+  on its own call and the previous one, so every window is replayed once per
+  case (continuing armed / fresh arm / disarmed) and the M × |p| schedules
+  are assembled exactly from those replays. A deployment starts DISARMED.
 
 Explicitly deferred (named so they are not silently done): JS port of the
 overlay and browser-simulator parity for overlay paths; promoting BTC

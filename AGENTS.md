@@ -92,8 +92,9 @@ src/near_bot/
 └── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, validate,
                     #   arm, disarm, journal {list,report}, status, paper, live
 
-tests/              # 118-test pytest suite (see below)
-experiments/        # sweep.py (plateau robustness), make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
+tests/              # 123-test pytest suite (see below)
+experiments/        # sweep.py (plateau robustness), regime_sweep.py (value of regime-call accuracy, DESIGN.md §7.4),
+                    #   make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
 docs/               # STRATEGY.md (v2 rationale), DESIGN.md (Trend Rider contract), engine.js, GitHub Pages site
 config.yaml         # all reproducible run parameters (secrets NEVER here — env vars only)
@@ -142,6 +143,11 @@ near-bot paper
 
 # Plateau-robustness sweep (perturbs one parameter at a time; needs real data CSV)
 python experiments/sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
+
+# Synthetic-regime sweep: what is regime-call accuracy p worth to engine + overlay?
+# (labels from realised walk-forward P&L; M seeded synthetic humans per p;
+#  empirical break-even vs the arithmetic, 40% and 56%) -> reports/regime_sweep.md
+python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 ```
 
 `near-bot live` trades real funds and is guarded by an interactive
@@ -150,7 +156,7 @@ python experiments/sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 ## Testing
 
 ```bash
-pytest -q                                # 118 tests, all offline (synthetic fixtures)
+pytest -q                                # 123 tests, all offline (synthetic fixtures)
 ruff check src tests                     # lint — must be clean (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py      # regenerate parity fixtures (writes /tmp/*.json)
 node experiments/parity_check.js         # JS engine == Python engine (needs Node.js)
@@ -190,6 +196,10 @@ Testing strategy and conventions:
   determinism (the vectorised resampler is pinned bit-for-bit to the scalar
   reference), deflated Sharpe, decision clustering, BTC-regime causality, and
   the `near-bot validate` CLI end to end.
+- **Regime-sweep tests** (`test_regime_sweep.py`, loads the experiment by
+  path): on hand-built windows the Monte Carlo break-even must land on the
+  hand-computed one, and the replay cases must honour the overlay contract
+  (continuing armed = no cooldown, fresh arm = cooldown, disarmed = flat).
 
 CI (`.github/workflows/ci.yml`) runs on push/PR: a Python 3.10–3.12 matrix
 with `ruff check src tests` + `pytest -q`, plus a separate **parity job**
