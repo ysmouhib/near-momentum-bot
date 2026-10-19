@@ -144,6 +144,25 @@ def mean_stat(x: np.ndarray) -> float:
     return float(x.mean())
 
 
+def wilson_ci(k: float, n: float, alpha: float = 0.05) -> tuple[float, float]:
+    """Wilson score interval for a proportion ``k / n``.
+
+    ``k`` and ``n`` may be fractional *effective* counts (e.g. n / block for
+    serially dependent calls). Unlike a percentile bootstrap it never
+    collapses to zero width — five correct calls out of five still leave a
+    lower bound far below 100% — which is the honest answer for a short
+    record.
+    """
+    if n <= 0:
+        return (0.0, 1.0)
+    z = _NORM.inv_cdf(1 - alpha / 2)
+    phat = k / n
+    denom = 1 + z * z / n
+    centre = (phat + z * z / (2 * n)) / denom
+    half = z * math.sqrt(phat * (1 - phat) / n + z * z / (4 * n * n)) / denom
+    return (max(0.0, centre - half), min(1.0, centre + half))
+
+
 # ------------------------------------------------------------ deflated sharpe
 
 def expected_max_sharpe(n_trials: int, var_sharpe: float) -> float:

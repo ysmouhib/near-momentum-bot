@@ -1,4 +1,4 @@
 -r requirements.txt
 pytest>=8.0
-ruff>=0.6
+ruff==0.17.1  # pinned: newer ruff versions change the default rule set
 matplotlib>=3.7

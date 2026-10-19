@@ -29,6 +29,26 @@ Every trading decision flows through the same `score.compute()` +
 `backtest.position_weight()` code for backtests, walk-forward and the live
 executor — *what you backtest is what you run* is a load-bearing invariant.
 
+**Trend Rider** (`docs/DESIGN.md`, the implementation contract) hardens v2
+into a production single-bot system with two layers *above* the unchanged
+engine:
+
+- **Human permission switch** — `near-bot arm` / `disarm` (a `--note` is
+  mandatory), 1–2 regime calls per day at most. DISARMED blocks *new entries
+  only*; open positions keep their engine exits. Every call is journaled
+  append-only in `state/journal.csv` and scored later (`near-bot journal report`).
+- **Mechanical risk overlay** (`overlay.py`) — kill-switch ladder: −2% on the
+  UTC day halts entries for the day; −5% from the equity HWM halves size
+  (clears at −3%); −10% flattens (the *only* overlay-forced exit) and waits
+  for a human re-arm. Every arm starts a half-size transition cooldown (3
+  trades). Sizing is risk-per-trade over the chandelier stop distance, capped
+  at 40% exposure. Leaving STOPPED re-anchors the full stop at the next
+  equity reading (otherwise the flattened account would re-stop forever).
+- **Validation battery** — `near-bot validate`: multi-symbol walk-forward
+  over one fixed dated window, block-bootstrap CIs, deflated Sharpe against
+  the trials ledger (`stats.TRIALS_TRIED`), N_eff (independent decisions),
+  BTC-regime conditioning, and a mandatory noise-clause verdict.
+
 **Not financial advice.** It defaults to the Binance testnet (paper trading).
 
 ## Technology stack and build
@@ -39,7 +59,8 @@ executor — *what you backtest is what you run* is a load-bearing invariant.
 - Core deps: `pandas>=2.0`, `numpy>=1.24`, `requests>=2.31`, `PyYAML>=6.0`.
   Optional extras: `[live]` = `python-binance` (broker wrapper, imported
   lazily so tests need no network), `[plot]` = `matplotlib` (report plots,
-  also lazily imported), `[dev]` = `pytest`, `ruff`.
+  also lazily imported), `[dev]` = `pytest`, `ruff==0.17.1` (pinned exactly —
+  see "Lint" below).
 - A **JavaScript port of the engine** (`docs/engine.js`) powers the GitHub
   Pages browser simulator (`docs/simulator.html`). It must stay bit-compatible
   with the Python engine — see "Engine parity" below.
@@ -54,52 +75,73 @@ pip install -e ".[dev,plot]"   # editable install with dev + plotting extras
 
 ```
 src/near_bot/
-├── config.py       # typed dataclass Config (YAML + env secrets); ScoreParams/RiskParams/CostParams
-├── data.py         # Binance kline parsing, N-minute aggregation (drops incomplete bar), dump-zip loading
+├── config.py       # typed dataclass Config (YAML + env secrets); Score/Risk/Cost/Data/Overlay/ValidationParams
+├── data.py         # Binance kline parsing, N-minute aggregation (drops incomplete bar), dump loading, find_gaps/window_gaps
 ├── indicators.py   # pure causal vectorised indicators: TSMOM, ER, Donchian, OFI z-score, ATR, vol; add_all(), warmup_bars()
 ├── score.py        # composite conviction score + regime gates; explain() one-liner
-├── backtest.py     # event-driven loop, hysteresis, vol-target sizing, exact per-bar MTM accounting, metrics
+├── backtest.py     # event-driven loop, hysteresis, vol-target sizing, exact per-bar MTM accounting, metrics; optional overlay/armed path
 ├── walkforward.py  # rolling train/test windows, Sharpe selection, top-k ensemble, optional embargo; DEFAULT_GRID (12 combos, deliberately small)
+├── overlay.py      # pure kill-switch state machine, transition cooldown, risk sizing; atomic JSON state persistence
+├── journal.py      # append-only decision journal + accuracy report (replayed engine P&L, bootstrap/Wilson CIs, measured break-even)
+├── stats.py        # block bootstrap CIs, deflated Sharpe + TRIALS_TRIED ledger, decision clustering (N_eff), Wilson CI
+├── validate.py     # the validation battery behind `near-bot validate` (CIs, DSR, N_eff, BTC regime, verdict)
 ├── report.py       # matplotlib equity/drawdown/exposure/trade plots (optional dep)
 ├── dump_client.py  # data.binance.vision public daily+monthly zips (no key, no geo-block); fetch_range + manifest
-├── broker.py       # python-binance spot wrapper: paginated klines, LOT_SIZE/min-notional, long-only market orders
-├── executor.py     # paper/live loop reusing the backtester's score + sizing + exit rules
-└── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, paper, live
+├── broker.py       # python-binance spot wrapper: paginated klines, LOT_SIZE/min-notional, long-only market orders, equity_usdt()
+├── executor.py     # paper/live loop reusing the backtester's score + sizing + exit rules; overlay, restart reconciliation
+└── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, validate,
+                    #   arm, disarm, journal {list,report}, status, paper, live
 
-tests/              # 46-test pytest suite (see below)
+tests/              # 118-test pytest suite (see below)
 experiments/        # sweep.py (plateau robustness), make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
-docs/               # STRATEGY.md (the design rationale), engine.js, static GitHub Pages site (index.html, simulator.html)
+docs/               # STRATEGY.md (v2 rationale), DESIGN.md (Trend Rider contract), engine.js, GitHub Pages site
 config.yaml         # all reproducible run parameters (secrets NEVER here — env vars only)
 DEPLOY.md           # repo push, GitHub Pages, real-data reproduction, testnet paper trading
-data/               # downloaded klines CSVs (gitignored except .gitkeep)
-reports/            # generated plots (gitignored)
+data/               # downloaded klines CSVs + .manifest.json sidecars (CSVs gitignored)
+state/              # journal.csv + overlay_state.json (gitignored — and must be BACKED UP)
+reports/            # generated plots and validate.md (gitignored)
 ```
 
 ## Common commands
 
 ```bash
 # Data: a fixed window of 1m klines from public dumps (no API key; --source api uses REST)
-# writes data/NEARUSDT_1m_20230101_20260101.csv + a .manifest.json sidecar
-python scripts/download_data.py --symbols NEARUSDT --start 2023-01-01 --end 2026-01-01
+# writes data/NEARUSDT_1m_20230101_20260101.csv + a .manifest.json sidecar;
+# gaps > 5 min are listed, a gap > 1 day fails unless --allow-gaps
+python scripts/download_data.py --symbols NEARUSDT ETHUSDT SOLUSDT BTCUSDT --start 2023-01-01 --end 2026-01-01
+near-bot download --symbols NEARUSDT --start 2023-01-01 --end 2026-01-01   # same, via the CLI
 
-# Fixed-config backtest (optimistic upper bound)
-near-bot backtest --csv data/klines_1m.csv --trades --plot reports/backtest.png
+# Fixed-config backtest (optimistic upper bound); --overlay adds the risk overlay
+near-bot backtest --csv data/NEARUSDT_1m_20230101_20260101.csv --trades --plot reports/backtest.png
 
-# Walk-forward validation (the endorsed number; OOS windows only)
-near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png
-near-bot walkforward --csv data/klines_1m.csv --grid grid.yaml --top-k 3   # custom YAML grid
+# Walk-forward validation (OOS windows only); --overlay validates the production posture
+near-bot walkforward --csv data/NEARUSDT_1m_20230101_20260101.csv --plot reports/oos.png
+near-bot walkforward --csv data/NEARUSDT_1m_20230101_20260101.csv --grid grid.yaml --top-k 3
 
-# One-shot real-data reproduction (backtest + walk-forward + USDT P&L summary)
+# The validation battery (the endorsed numbers): every data.symbols CSV of one
+# window, 90d/30d and 30d/10d variants, CIs + deflated Sharpe + N_eff + verdict
+near-bot validate                                   # -> reports/validate.md + plots
+near-bot validate --windows 90:30 --n-boot 2000 --no-plots
+
+# Human permission layer (works offline; equity/price are filled in when keys are set)
+near-bot arm --note "BTC reclaimed 200h MA, ER rising"   # --note is mandatory
+near-bot disarm --note "chop after CPI"
+near-bot status                                     # overlay state + BTC/ETH regime context
+near-bot journal list
+near-bot journal report --horizon-days 5            # accuracy vs measured break-even
+
+# Legacy one-shot 90-day reproduction (rolling window — not reproducible across days)
 python scripts/simulate_90d.py --symbol NEARUSDT --days 90 --capital 1000 --plot
 
-# Paper trading on the testnet (keys from https://testnet.binance.vision)
+# Paper trading on the testnet (keys from https://testnet.binance.vision);
+# the overlay is forced on and a fresh state is DISARMED: arm before expecting trades
 cp .env.example .env && export $(cat .env | xargs)
 near-bot test-connection
 near-bot paper
 
 # Plateau-robustness sweep (perturbs one parameter at a time; needs real data CSV)
-python experiments/sweep.py --csv data/klines_1m.csv
+python experiments/sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 ```
 
 `near-bot live` trades real funds and is guarded by an interactive
@@ -108,8 +150,8 @@ python experiments/sweep.py --csv data/klines_1m.csv
 ## Testing
 
 ```bash
-pytest -q                                # 46 tests, all offline (synthetic fixtures)
-ruff check src tests                     # lint (no ruff config pinned; see note below)
+pytest -q                                # 118 tests, all offline (synthetic fixtures)
+ruff check src tests                     # lint — must be clean (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py      # regenerate parity fixtures (writes /tmp/*.json)
 node experiments/parity_check.js         # JS engine == Python engine (needs Node.js)
 ```
@@ -133,10 +175,26 @@ Testing strategy and conventions:
   trading on an unfinished bar is a classic look-ahead bug.
 - Walk-forward tests cover window discipline, embargo gaps, top-k ensemble
   behaviour, the min-trades gate, determinism, and grid validation.
+- **Overlay tests** (`test_overlay.py`, `test_backtest_overlay.py`): every
+  kill-switch transition incl. tier hysteresis, re-arm after a full stop
+  (must stick, tier × cooldown = 0.25), overlay sizing and halts/flattens
+  pinned to hand arithmetic on hand-built frames, `armed` edges acting as
+  human arm/disarm, and the **overlay-off identity** (`run(frame, cfg)` is
+  byte-identical to `run(..., overlay=None)` — this protects JS parity).
+- **Executor tests** (`test_executor.py`, FakeBroker, offline): permission
+  gating, fail-closed overlay errors, full-stop flatten, restart
+  reconciliation (incl. trailing-stop peak and bar count surviving a restart).
+- **Journal / stats / validate tests**: append-only roundtrip, `--note`
+  enforcement, truncated forward windows marked open, full-stop losses in the
+  measured break-even, CIs that cannot collapse on short records, bootstrap
+  determinism (the vectorised resampler is pinned bit-for-bit to the scalar
+  reference), deflated Sharpe, decision clustering, BTC-regime causality, and
+  the `near-bot validate` CLI end to end.
 
 CI (`.github/workflows/ci.yml`) runs on push/PR: a Python 3.10–3.12 matrix
 with `ruff check src tests` + `pytest -q`, plus a separate **parity job**
-(make_fixtures + node parity_check).
+(make_fixtures + node parity_check). Keep code 3.10-compatible (e.g.
+`dt.timezone.utc`, not the 3.11+ `dt.UTC`).
 
 **Engine parity**: `docs/engine.js` is a faithful port of
 `{data,indicators,score,backtest}.py`. If you change any of those Python
@@ -144,15 +202,18 @@ modules (or their defaults), you must make the equivalent change in
 `docs/engine.js` and re-run the parity check — CI enforces identical trades,
 prices, weights and metrics across several parameter/cost/aggregation cases.
 Conversely, keep the Python engine free of pandas idioms that resist exact JS
-reproduction (the check compares to 1e-9 on prices, 1e-6 on metrics).
+reproduction (the check compares to 1e-9 on prices, 1e-6 on metrics). The
+overlay/`armed` path in `backtest.py` is **off by default and not ported to
+JS** (deferred, DESIGN.md §11): parity fixtures never pass an overlay, so
+they stay valid; never let overlay logic leak into the default path.
 
-**Ruff note**: the project has no `[tool.ruff]` config; `ruff>=0.6` is
-installed unpinned. Newer ruff versions (e.g. 0.17.x) flag extra default rules
-(I001 import sorting, ISC004 implicit string concatenation, SIM117, UP037,
-TRY401) that the codebase written against ruff 0.6 does not satisfy. As of
-this writing `ruff check src tests` reports 7 such stylistic findings while
-`pytest -q` passes 46/46. Decide consciously whether to fix, ignore, or pin
-the rule set before treating lint failures as blockers.
+**Lint**: there is no `[tool.ruff]` config — the project uses ruff's default
+rule set, and ruff is pinned exactly (`ruff==0.17.1` in pyproject's `[dev]`
+extra and `requirements-dev.txt`; CI asserts the version) because the default
+rule set grows between releases and an unpinned linter turns CI red without a
+line of code changing. `ruff check src tests` must stay clean. Bump the pin
+deliberately, fixing any new findings in the same change. Implicit string
+concatenation inside a list/tuple must be parenthesised (ISC004).
 
 ## Code style
 
@@ -164,8 +225,12 @@ the rule set before treating lint failures as blockers.
 - `from __future__ import annotations` at the top of every module; type hints
   on public functions.
 - Configuration is typed dataclasses (`config.py`) mirroring `config.yaml`
-  sections (`strategy:`, `risk:`, `costs:`). Lookbacks are in *aggregated bars*
-  (60m default): `mom_fast=36` ≈ 1.5 days, `trend_window=200` ≈ 8 days.
+  sections (`strategy:`, `risk:`, `costs:`, `data:`, `overlay:`,
+  `validation:`). Lookbacks are in *aggregated bars* (60m default):
+  `mom_fast=36` ≈ 1.5 days, `trend_window=200` ≈ 8 days.
+- Overlay thresholds are **a-priori risk policy**, never walk-forward
+  optimised; every configuration evaluated (grid cell, window variant,
+  overlay threshold) is a trial — bump `stats.TRIALS_TRIED` when you try one.
 - Optional/heavy dependencies (`python-binance`, `matplotlib`, `yaml` fallback)
   are imported lazily inside functions so the core engine and tests run without
   them and without network.
@@ -193,8 +258,16 @@ the rule set before treating lint failures as blockers.
 - Downloaded klines (`data/*.csv`), generated plots (`reports/`) and parity
   fixtures (`/tmp/*.json`) are throwaway artifacts and gitignored — do not
   commit them.
+- **`state/` is gitignored but is not throwaway**: `journal.csv` is the
+  measurement instrument for the human's accuracy (append-only — no edit
+  command; fix mistakes by appending a `correction` event) and
+  `overlay_state.json` holds the HWM, kill-switch tier, cooldown and the open
+  position. Back it up; losing the journal resets the track record to zero.
+  State writes are atomic (tmp + rename).
 - The live loop swallows per-cycle exceptions to stay alive on transient API
-  errors (logs them via `logger.exception`); preserve that resilience.
+  errors (logs them via `logger.exception`); preserve that resilience. Overlay
+  evaluation failures **fail closed** (entries blocked for that cycle), and a
+  state/exchange mismatch at startup blocks entries until a human resolves it.
 
 ## Deployment
 

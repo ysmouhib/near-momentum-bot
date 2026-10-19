@@ -67,6 +67,44 @@ def test_measured_break_even_none_without_two_sides(cfg):
     assert journal.measured_break_even(journal.load(cfg.overlay.journal_path)) is None
 
 
+def test_break_even_counts_full_stop_flatten(cfg):
+    for pnl in (0.012, 0.009):
+        journal.append(cfg.overlay.journal_path, "trade", "armed", "trail_stop",
+                       context=f"weighted_pct={pnl}")
+    journal.append(cfg.overlay.journal_path, "auto_flatten", "stopped",
+                   "full stop: position flattened at market",
+                   context="weighted_pct=-0.03")
+    be = journal.measured_break_even(journal.load(cfg.overlay.journal_path))
+    # W = 0.0105, L = 0.03 (the flatten is the only loss)
+    assert be == pytest.approx(0.03 / 0.0405)
+
+
+def _scored(events, correct):
+    n = len(correct)
+    return pd.DataFrame({"status": ["scored"] * n, "event": events,
+                         "correct": correct, "strat_ret": [0.01] * n,
+                         "market_ret": [0.01] * n})
+
+
+def test_accuracy_cis_never_collapse_on_short_records():
+    # all-correct record: zero variance under any resampling
+    rep = journal.accuracy_report(_scored(["arm", "disarm"] * 2, [True] * 4),
+                                  pd.DataFrame(columns=journal.COLUMNS), n_boot=200)
+    lo, hi = rep["overall"]["ci"]
+    slo, _ = rep["overall"]["ci_streak"]
+    assert lo < 1.0 and hi == 1.0 and slo < 1.0
+    assert rep["by_type"]["arm"]["ci"][0] < 1.0
+    # five mixed calls: a block of 5 used to rotate the sample (zero width)
+    rep = journal.accuracy_report(
+        _scored(["arm", "disarm", "arm", "disarm", "arm"], [True, False, True, True, False]),
+        pd.DataFrame(columns=journal.COLUMNS), n_boot=200)
+    lo, hi = rep["overall"]["ci"]
+    slo, shi = rep["overall"]["ci_streak"]
+    assert lo < 0.6 < hi and slo < 0.6 < shi
+    lo, hi = rep["by_type"]["arm"]["ci"]
+    assert lo < hi
+
+
 def test_arm_requires_note(cfg, tmp_path):
     with pytest.raises(SystemExit):
         cli.main(["--config", _config_file(cfg, tmp_path), "arm"])
@@ -110,6 +148,18 @@ def test_score_calls_open_and_scored(cfg):
     assert row["n_bars"] == 5 * 24  # 5 days of 60m bars
     # arm is correct iff the replayed strategy made money in the window
     assert row["correct"] == bool(row["strat_ret"] > 0.0)
+
+
+def test_score_calls_marks_truncated_window_open(cfg):
+    frame = _frame_and_cfg(cfg)  # 60m bars, ~8.3 days
+    t0 = frame["timestamp"].iloc[150]  # +5 days runs past the last bar
+    events = pd.DataFrame({
+        "ts_utc": pd.to_datetime([t0], utc=True), "event": ["arm"], "note": ["a"],
+        "state_after": ["armed"], "equity": [""], "price": [""], "hwm": [""],
+        "context": [""],
+    })
+    scored = journal.score_calls(events, frame, cfg, horizon_days=5)
+    assert list(scored["status"]) == ["open"]
 
 
 def test_accuracy_report_and_format(cfg):

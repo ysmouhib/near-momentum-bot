@@ -88,8 +88,8 @@ class WalkForwardResult:
         traded = [w for w in self.windows if w.combos is not None]
         skipped = len(self.windows) - len(traded)
         lines = [
-            f"Walk-forward: {len(self.windows)} windows "
-            f"({len(traded)} traded, {skipped} skipped)"
+            (f"Walk-forward: {len(self.windows)} windows "
+             f"({len(traded)} traded, {skipped} skipped)")
         ]
         m = self.oos_metrics
         if m.get("n_trades", 0) > 0:
@@ -97,8 +97,8 @@ class WalkForwardResult:
                 (f"OOS trades       : {m['n_trades']} "
                  f"(independent decisions N_eff = {self.n_eff})"),
                 f"OOS win rate     : {m['win_rate']:.1%}",
-                f"OOS expectancy   : {m['expectancy_weighted']:+.4%} weighted "
-                f"(gross {m['expectancy_gross']:+.4%}, drag {m['cost_drag']:.4%})",
+                (f"OOS expectancy   : {m['expectancy_weighted']:+.4%} weighted "
+                 f"(gross {m['expectancy_gross']:+.4%}, drag {m['cost_drag']:.4%})"),
                 f"OOS total return : {m['total_return']:+.2%} (buy&hold {m['buy_hold']:+.2%})",
                 f"OOS Sharpe       : {m['sharpe']:+.2f}",
                 f"OOS max drawdown : {m['max_drawdown']:.2%}",

@@ -22,7 +22,8 @@ Overlay integration (docs/DESIGN.md §4.5)
 * **Fail closed**: if overlay evaluation itself raises, the cycle behaves as
   DISARMED (no entries). A risk overlay that crashes open is worse than none.
 * **Restart reconciliation**: the open position and equity anchors live in
-  ``state/overlay_state.json``, written at every fill. On startup the state
+  ``state/overlay_state.json``, written at every fill and on every new bar
+  while in a position (the trailing-stop peak moves bar by bar). On startup the state
   is checked against actual exchange balances — a state/exchange mismatch
   (e.g. a manually placed order) blocks entries until the human resolves it,
   because absorbing a discrepancy silently is how risk systems lie.
@@ -33,6 +34,8 @@ from __future__ import annotations
 import logging
 import time
 from dataclasses import dataclass
+
+import pandas as pd
 
 from . import data, indicators
 from . import overlay as ov
@@ -92,9 +95,21 @@ class Executor:
 
     # ---------------------------------------------------------- persistence
     def _persist(self):
+        """Write the overlay state and the open position (if any) atomically.
+
+        Called at every fill *and* on every new bar while in a position: the
+        chandelier peak and the time-stop counter move bar by bar, and a
+        restart that reloaded them from the fill would quietly loosen the
+        trailing stop and restart the time stop. ``last_bar_time`` comes along
+        so the first cycle after a restart does not count the same bar twice.
+        """
         if self.ov_state is not None:
-            self.ov_state.open_position = (
-                self.position.to_dict() if self.position else None)
+            saved = None
+            if self.position:
+                saved = self.position.to_dict()
+                saved["last_bar_time"] = (None if self.last_bar_time is None
+                                          else str(self.last_bar_time))
+            self.ov_state.open_position = saved
             ov.save_state(self.ov_state, self.cfg.overlay.state_path)
 
     def _journal(self, event: str, note: str, equity: float | str = "",
@@ -122,8 +137,8 @@ class Executor:
             free_base, locked_base = self.broker.balance(base)
             held = free_base + locked_base
             price = self.broker.price()
-        except Exception as exc:
-            logger.error("Reconciliation read failed (%s) — entries blocked", exc)
+        except Exception:
+            logger.exception("Reconciliation read failed — entries blocked")
             self._entries_blocked = True
             return
         dust = (self.broker.min_notional or 0.0) / price if price else 0.0
@@ -136,6 +151,8 @@ class Executor:
                 entry_bar_time=saved.get("entry_bar_time"),
                 bars_held=saved.get("bars_held", 0),
                 m_tier=saved.get("m_tier", 1.0), m_cooldown=saved.get("m_cooldown", 1.0))
+            if saved.get("last_bar_time"):
+                self.last_bar_time = pd.Timestamp(saved["last_bar_time"])
             logger.info("Reconciled open position from state: %s", self.position)
         elif saved:
             logger.warning("State had an open position but the exchange holds no "
@@ -182,7 +199,7 @@ class Executor:
                 self._journal(event, note, equity=round(equity, 2), price=live_price)
             if events:
                 self._persist()
-        except Exception:  # noqa: BLE001 - fail closed on *any* overlay error
+        except Exception:  # fail closed on *any* overlay error
             logger.exception("Overlay evaluation failed — failing closed")
             return False
         if ov.should_flatten(self.ov_state) and self.position:
@@ -311,6 +328,8 @@ class Executor:
         entries_allowed = self._overlay_cycle(row, live_price)
         if self.position:
             self._manage_position(row, live_price)
+            if self.position and new_bar:
+                self._persist()  # peak / bars held moved: survive a restart
         if self.position is None and entries_allowed and not self._entries_blocked:
             self._maybe_enter(row, live_price)
 
@@ -334,8 +353,8 @@ class Executor:
                 start = time.time()
                 try:
                     self.step()
-                except Exception as exc:  # keep the loop alive on transient errors
-                    logger.exception("Cycle error: %s", exc)
+                except Exception:  # keep the loop alive on transient errors
+                    logger.exception("Cycle error")
                 time.sleep(max(1, poll_seconds - (time.time() - start)))
         except KeyboardInterrupt:
             logger.info("Stopped by user. Closed trades: %d", len(self.closed_trades))

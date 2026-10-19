@@ -169,7 +169,7 @@ class Config:
     api_secret: str = field(default="", repr=False)
 
     @classmethod
-    def load(cls, path: str | Path = "config.yaml") -> "Config":
+    def load(cls, path: str | Path = "config.yaml") -> Config:
         raw: dict[str, Any] = {}
         p = Path(path)
         if p.exists():

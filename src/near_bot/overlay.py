@@ -50,6 +50,7 @@ class OverlayState:
 
     state: str = DISARMED
     hwm: float = 1.0                 # high-water mark of mark-to-market equity
+    rearm_peak: float | None = None  # full-stop reference after leaving STOPPED (None = HWM)
     day_start_equity: float = 1.0    # equity at the first bar/cycle of the UTC day
     day_start_date: str = ""         # YYYY-MM-DD (UTC) of the current day anchor
     halted_date: str = ""            # UTC date under daily-loss halt ("" = none)
@@ -63,22 +64,40 @@ class OverlayState:
 # journal (journal.py). The overlay itself never writes the journal.
 
 def arm(state: OverlayState, p) -> list[tuple[str, str]]:
-    """Human arms the bot. Re-arming while armed is a journaled no-op."""
+    """Human arms the bot. Re-arming while armed is a journaled no-op.
+
+    Leaving STOPPED — by this call or by ``disarm`` — re-anchors the full
+    stop at the equity of the next evaluation: the human has acknowledged the
+    stop and re-underwrites the regime thesis from *here*. The flattened
+    account still sits at the −10% that tripped the stop; measured from the
+    old HWM it would re-stop on the very next bar and no re-arm could ever
+    stick. The half-size tier keeps measuring from the true HWM, so a re-arm
+    deep in drawdown trades at tier × cooldown (0.5 × 0.5 = 0.25) until
+    equity recovers (DESIGN.md §4.3).
+    """
     if state.state == ARMED:
         return [("arm", "already armed (no-op)")]
     prev = state.state
     state.state = ARMED
     state.cooldown_left = p.cooldown_trades_after_arm
     state.halted_date = ""
+    if prev == STOPPED:
+        state.rearm_peak = 0.0  # re-anchored at the next evaluation's equity
     return [("arm", f"armed from {prev}; half size for the next {state.cooldown_left} trades")]
 
 
 def disarm(state: OverlayState) -> list[tuple[str, str]]:
-    """Human disarms the bot: no new entries; open positions keep engine exits."""
+    """Human disarms the bot: no new entries; open positions keep engine exits.
+
+    Disarming out of STOPPED acknowledges the stop and re-anchors it, exactly
+    as ``arm`` does — otherwise stop → disarm → arm would lock the bot out.
+    """
     if state.state == DISARMED:
         return [("disarm", "already disarmed (no-op)")]
     prev = state.state
     state.state = DISARMED
+    if prev == STOPPED:
+        state.rearm_peak = 0.0  # re-anchored at the next evaluation's equity
     return [("disarm", f"disarmed from {prev}")]
 
 
@@ -97,19 +116,28 @@ def evaluate(state: OverlayState, p, equity: float, date_str: str) -> list[tuple
         state.halted_date = ""  # a new UTC day lifts the daily halt
 
     state.hwm = max(state.hwm, equity)
+    if state.rearm_peak is not None:
+        state.rearm_peak = max(state.rearm_peak, equity)
+        if state.rearm_peak >= state.hwm:
+            state.rearm_peak = None  # a new high: back to the plain HWM rule
     dd = equity / state.hwm - 1.0 if state.hwm > 0 else 0.0
+    # The full stop is measured from the HWM, except between leaving STOPPED
+    # and the next equity high, when it is measured from the re-arm anchor
+    # (see ``arm``). The half-size tier always uses the true HWM.
+    stop_ref = state.hwm if state.rearm_peak is None else state.rearm_peak
+    stop_dd = equity / stop_ref - 1.0 if stop_ref > 0 else 0.0
 
     # The deepest tier wins and short-circuits the rest.
-    if dd <= p.hwm_full_stop_frac:
+    if stop_dd <= p.hwm_full_stop_frac:
         if state.state != STOPPED:
             state.state = STOPPED
             state.half_tier = False
             events.append(("auto_full_stop",
-                           (f"drawdown {dd:.1%} from HWM <= {p.hwm_full_stop_frac:.0%}; "
-                            "flatten and wait for human re-arm")))
+                           (f"drawdown {stop_dd:.1%} from peak <= "
+                            f"{p.hwm_full_stop_frac:.0%}; flatten and wait for human re-arm")))
         return events
     if state.state == STOPPED:
-        return events  # only a human arm() leaves this state
+        return events  # only a human call (arm/disarm) leaves this state
 
     if state.day_start_equity > 0:
         day_ret = equity / state.day_start_equity - 1.0

@@ -12,6 +12,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev]"
+      # ruff is pinned in pyproject's [dev] extra; assert it so a loosened pin
+      # fails loudly here instead of silently changing the rule set.
+      - run: test "$(ruff --version)" = "ruff 0.17.1"
       - run: ruff check src tests
       - run: pytest -q
   parity:

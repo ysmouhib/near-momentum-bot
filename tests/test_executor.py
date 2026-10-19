@@ -179,6 +179,36 @@ def test_full_stop_flattens_and_waits_for_human(cfg):
     assert len([o for o in broker.orders if o[0] == "buy"]) == 1
 
 
+def test_restart_keeps_trailing_stop_and_bar_count(cfg):
+    """Peak close and bars held move every bar; a restart must resume them,
+    not reload the values written at the fill."""
+    broker = FakeBroker(price=100.0, free_usdt=1000.0)
+    ex = _executor(cfg, broker, arm=True)
+    ex.step()  # enter @ 100 on the 01:00 bar
+    for ts, close in (("2026-03-01 02:00", 110.0), ("2026-03-01 03:00", 120.0)):
+        ex._fetch_frame = lambda ts=ts, close=close: _frame([0.5, 0.5], ts=ts, close=close)
+        ex.step()
+    assert ex.position.peak_close == 120.0 and ex.position.bars_held == 2
+
+    restarted = Executor(cfg, broker)  # same exchange balances, fresh process
+    pos = restarted.position
+    assert pos.peak_close == 120.0 and pos.bars_held == 2
+    assert restarted.last_bar_time == pd.Timestamp("2026-03-01 03:00")
+    # the bar that was current at shutdown is not counted twice
+    restarted._fetch_frame = lambda: _frame([0.5, 0.5], ts="2026-03-01 03:00", close=120.0)
+    restarted.step()
+    assert restarted.position.bars_held == 2
+    # trail = 120 - 3 * ATR(1.0) = 117: a 116 close exits (a trail reloaded
+    # from the fill would sit at 97 and miss it). Score 0.2 sits inside the
+    # no-trade band: no score-fade exit, no same-cycle re-entry.
+    restarted._fetch_frame = lambda: _frame([0.2, 0.2], ts="2026-03-01 04:00", close=116.0)
+    restarted.step()
+    assert restarted.position is None
+    assert broker.orders[-1][0] == "sell"
+    trades = journal.load(cfg.overlay.journal_path)
+    assert "exit trail_stop" in set(trades["note"])
+
+
 def test_overlay_failure_fails_closed(cfg):
     broker = FakeBroker()
     broker.fail_equity = True

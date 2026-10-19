@@ -7,7 +7,6 @@ must never change the past (no look-ahead).
 
 from __future__ import annotations
 
-
 import numpy as np
 
 from near_bot import backtest as bt

@@ -49,7 +49,7 @@ def append(path: str | Path, event: str, state_after: str, note: str,
         w = csv.writer(fh)
         if new:
             w.writerow(COLUMNS)
-        w.writerow([dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
+        w.writerow([dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
                     event, state_after, note, equity, price, hwm, context])
 
 
@@ -63,10 +63,19 @@ def load(path: str | Path) -> pd.DataFrame:
     return df
 
 
+TRADE_EVENTS = ("trade", "auto_flatten")
+
+
 def _trade_pnls(events: pd.DataFrame) -> np.ndarray:
-    """Realised weighted P&L of journaled trades (context='weighted_pct=...')."""
+    """Realised weighted P&L of journaled trades (context='weighted_pct=...').
+
+    Engine exits are journaled as ``trade``; the overlay's full-stop flatten
+    as ``auto_flatten``. Both are realised trades, and the flatten is usually
+    the *largest* loss — leaving it out would understate L and flatter the
+    human with a break-even that is too low.
+    """
     out = []
-    for ctx in events.loc[events["event"] == "trade", "context"]:
+    for ctx in events.loc[events["event"].isin(TRADE_EVENTS), "context"]:
         for kv in str(ctx).split():
             if kv.startswith("weighted_pct="):
                 try:
@@ -98,7 +107,9 @@ def score_calls(events: pd.DataFrame, frame: pd.DataFrame, cfg,
     ``frame`` is the indicator frame (``indicators.add_all`` output) covering
     the journal's time span. For each call the engine is replayed over the
     forward window; indicators are causal and computed on the full frame, so
-    slicing leaks nothing. Windows running past the data are marked ``open``.
+    slicing leaks nothing. A window that runs past the last bar is marked
+    ``open`` — scoring a call on a truncated window would judge it on a
+    shorter horizon than every other call.
     """
     from . import backtest as bt  # local import: keeps journal importable standalone
 
@@ -116,7 +127,7 @@ def score_calls(events: pd.DataFrame, frame: pd.DataFrame, cfg,
         b = int(np.searchsorted(times, t0 + horizon))
         row = {"ts_utc": call["ts_utc"], "event": call["event"],
                "note": call["note"], "n_bars": max(0, b - a)}
-        if a >= len(times) - 1 or b - a < 2 or b > len(times):
+        if a >= len(times) - 1 or b - a < 2 or t0 + horizon > times[-1]:
             row.update(status="open", strat_ret=np.nan, market_ret=np.nan,
                        correct=np.nan)
         else:
@@ -130,16 +141,37 @@ def score_calls(events: pd.DataFrame, frame: pd.DataFrame, cfg,
     return pd.DataFrame(rows)
 
 
+def _accuracy_ci(correct: np.ndarray, block: int, n_boot: int,
+                 seed: int) -> tuple[float, float, float]:
+    """Accuracy with a CI that cannot collapse onto the point estimate.
+
+    A percentile bootstrap fails a short journal in two ways: a circular
+    block as long as the record only *rotates* it (every resample has the
+    same mean), and an all-correct record has zero variance under any
+    resampling. So the block is capped at a third of the record, and the
+    interval reported is the wider of the block bootstrap and a Wilson score
+    interval at the effective sample size n / block.
+    """
+    from . import stats
+
+    n = len(correct)
+    block = max(1, min(block, n // 3))
+    pt, lo, hi = stats.bootstrap_ci(correct, stats.mean_stat, n_boot=n_boot,
+                                    block=block, seed=seed)
+    w_lo, w_hi = stats.wilson_ci(pt * n / block, n / block)
+    return pt, min(lo, w_lo), max(hi, w_hi)
+
+
 def accuracy_report(scored: pd.DataFrame, events: pd.DataFrame,
                     n_boot: int = 10000, seed: int = 7) -> dict:
     """Accuracy per call type with bootstrap CIs, against the measured break-even.
 
     Two bootstrap flavours: plain (resample calls) and streak (block bootstrap
     over the chronological call sequence, block 10) — consecutive calls are
-    not independent, and the streak CI is the honest one of the two.
+    not independent, and the streak CI is the honest one of the two. Both
+    are floored by a Wilson interval (``_accuracy_ci``) so a short record can
+    never produce a zero-width CI.
     """
-    from . import stats
-
     out: dict = {"n_calls": len(scored), "n_scored": 0, "by_type": {}}
     done = scored[scored["status"] == "scored"] if len(scored) else scored
     out["n_scored"] = len(done)
@@ -149,9 +181,8 @@ def accuracy_report(scored: pd.DataFrame, events: pd.DataFrame,
     for event_type in HUMAN_EVENTS:
         sub = done[done["event"] == event_type]
         if len(sub):
-            pt, lo, hi = stats.bootstrap_ci(
-                sub["correct"].to_numpy(dtype=float), stats.mean_stat,
-                n_boot=n_boot, block=max(1, min(5, len(sub))), seed=seed)
+            _, lo, hi = _accuracy_ci(sub["correct"].to_numpy(dtype=float), 1,
+                                     n_boot, seed)
             out["by_type"][event_type] = {
                 "n": len(sub), "accuracy": float(sub["correct"].mean()),
                 "ci": (lo, hi),
@@ -159,10 +190,8 @@ def accuracy_report(scored: pd.DataFrame, events: pd.DataFrame,
                 "avg_market_ret": float(sub["market_ret"].mean()),
             }
     correct = done["correct"].to_numpy(dtype=float)
-    pt, lo, hi = stats.bootstrap_ci(correct, stats.mean_stat, n_boot=n_boot,
-                                    block=max(1, min(5, len(done))), seed=seed)
-    _, slo, shi = stats.bootstrap_ci(correct, stats.mean_stat, n_boot=n_boot,
-                                     block=max(1, min(10, len(done))), seed=seed + 1)
+    pt, lo, hi = _accuracy_ci(correct, 1, n_boot, seed)
+    _, slo, shi = _accuracy_ci(correct, 10, n_boot, seed + 1)
     out["overall"] = {"n": len(done), "accuracy": pt, "ci": (lo, hi),
                       "ci_streak": (slo, shi)}
     out["break_even"] = measured_break_even(events)

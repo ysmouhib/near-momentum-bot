@@ -26,7 +26,8 @@ from dataclasses import dataclass, field
 import numpy as np
 import pandas as pd
 
-from . import indicators, score as score_mod
+from . import indicators
+from . import score as score_mod
 
 
 @dataclass
@@ -61,8 +62,8 @@ class BacktestResult:
         lines = [
             f"Trades            : {m['n_trades']}",
             f"Win rate          : {m['win_rate']:.1%}",
-            f"Expectancy/trade  : {m['expectancy_weighted']:+.4%} weighted "
-            f"(unweighted {m['expectancy']:+.4%})",
+            (f"Expectancy/trade  : {m['expectancy_weighted']:+.4%} weighted "
+             f"(unweighted {m['expectancy']:+.4%})"),
             f"  gross / drag    : {m['expectancy_gross']:+.4%} / {m['cost_drag']:.4%}",
             f"Profit factor     : {m['profit_factor']:.2f}",
             f"Total return      : {m['total_return']:+.2%}  (buy&hold {m['buy_hold']:+.2%})",
@@ -95,7 +96,8 @@ def position_weight(vol_bar: float, bar_minutes: int, target_vol: float,
 
 
 def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None,
-        overlay=None, armed: pd.Series | None = None) -> BacktestResult:
+        overlay=None, armed: pd.Series | None = None,
+        armed_before: bool = True) -> BacktestResult:
     """Backtest over ``frame`` (output of ``indicators.add_all``).
 
     ``score`` may be precomputed (walk-forward reuses it across configs); it is
@@ -107,6 +109,12 @@ def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None,
     boolean per-bar permission series (a human or synthetic regime schedule).
     Both default off: with neither given, the loop is byte-identical to the
     pure engine, which is what keeps the JS parity fixtures valid.
+
+    With an overlay, ``armed`` drives the state machine exactly as the human
+    does live: a False→True edge is ``overlay.arm`` (transition cooldown,
+    lifts STOPPED), a True→False edge is ``overlay.disarm``. ``armed_before``
+    is the permission just before the first bar — the default (already armed)
+    starts in steady state; False makes an armed first bar a fresh arm.
     """
     p = cfg.strategy
     costs = cfg.costs
@@ -134,7 +142,7 @@ def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None,
     ret, pos_arr, ov_stats = _run_loop(
         a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
         p, fee, slip, cfg.aggregate_minutes,
-        trades_out := [], overlay, a_armed,
+        trades_out := [], overlay, a_armed, armed_before,
     )
     equity = pd.Series(np.cumprod(1.0 + ret), index=rows.index, name="equity")
     bar_returns = pd.Series(ret, index=rows.index, name="bar_return")
@@ -146,7 +154,8 @@ def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None,
 
 
 def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
-              p, fee, slip, bar_minutes, trades, ov_params=None, a_armed=None):
+              p, fee, slip, bar_minutes, trades, ov_params=None, a_armed=None,
+              armed_before=True):
     """The trading loop. Returns (per-bar returns, per-bar weights, overlay stats).
 
     Accounting convention — every bar's return is written exactly once:
@@ -160,7 +169,9 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
     (``ov.can_enter`` — the human/kill-switch gate) and sizing composition
     (``ov.entry_weight``). Equity for the kill switch is tracked by folding
     each bar's return into a running product exactly once (``fold``), under
-    the same convention as the returns themselves.
+    the same convention as the returns themselves. Changes in ``a_armed``
+    reach the state machine as human arm/disarm calls (``human``) before the
+    kill switch is evaluated, mirroring the executor's cycle order.
     """
     from . import overlay as ov
 
@@ -176,7 +187,10 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
     m_cool_in = 1.0
     last_counted = -1  # highest bar index whose return has been written
 
-    ov_state = ov.OverlayState(state=ov.ARMED) if ov_params is not None else None
+    ov_state = None
+    if ov_params is not None:
+        ov_state = ov.OverlayState(state=ov.ARMED if armed_before else ov.DISARMED)
+    human_armed = armed_before
     ov_active = ov_params is not None or a_armed is not None
     dates = [str(t)[:10] for t in times] if ov_active else None
     eq = 1.0          # running mark-to-market equity for the kill switch
@@ -188,6 +202,16 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
         while eq_folded < j:
             eq_folded += 1
             eq *= 1.0 + ret[eq_folded]
+
+    def human(i):
+        nonlocal human_armed
+        want = bool(a_armed[i])
+        if want != human_armed:
+            if want:
+                ov.arm(ov_state, ov_params)
+            else:
+                ov.disarm(ov_state)
+            human_armed = want
 
     def ov_events(date_i):
         nonlocal halts, full_stops
@@ -214,6 +238,7 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
             if ov_active:
                 fold(i - 1)
                 if ov_params is not None:
+                    human(i)
                     ov_events(dates[i])
             s = a_score[i]
             if np.isfinite(s) and s > p.theta_in:
@@ -262,6 +287,7 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
         peak = max(peak, a_close[i])
         if ov_params is not None:
             fold(i)
+            human(i)
             ov_events(dates[i])
 
         exit_reason = None

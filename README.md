@@ -43,6 +43,28 @@ sample demands.
 The full reasoning — including the v1 failure analysis and the plateau-robustness
 checks on every parameter — is in [`docs/STRATEGY.md`](docs/STRATEGY.md).
 
+## Trend Rider: a human permission switch and a risk overlay on top
+
+The engine stays untouched; two layers sit above it (contract:
+[`docs/DESIGN.md`](docs/DESIGN.md)):
+
+- **Human permission at the regime level.** `near-bot arm --note "..."` /
+  `near-bot disarm --note "..."` — at most 1–2 calls a day, reason mandatory.
+  Disarming blocks *new entries only*; open trades keep their engine exits. Every
+  call is journaled append-only and later scored against what the engine actually
+  did (`near-bot journal report`), with confidence intervals and a break-even
+  accuracy *measured* from realised trades — the human layer has to earn its place.
+- **Mechanical risk overlay.** Kill-switch ladder: −2% on the UTC day halts entries,
+  −5% from the equity high-water mark halves size, −10% flattens and waits for a
+  human re-arm; half size for the first trades after every arm; risk-per-trade
+  sizing against the trailing-stop distance, capped at 40% exposure. Off by default
+  in backtests (`--overlay` turns it on), always on in paper/live.
+- **A validation battery.** `near-bot validate` runs walk-forward over one fixed
+  dated window per symbol and reports block-bootstrap CIs, a deflated Sharpe that
+  charges for every configuration tried, the number of *independent* decisions, and
+  a verdict that says "not distinguishable from noise" whenever that is the truth.
+  The multi-year run has not been done yet — no new performance claim is made here.
+
 ## Validation discipline, not performance claim
 
 **Read this section as a worked example of validation discipline, not as evidence
@@ -112,12 +134,23 @@ near-bot backtest --csv data/NEARUSDT_1m_20260417_20260717.csv --trades --plot r
 # 3. Walk-forward validation (the number that actually matters)
 near-bot walkforward --csv data/NEARUSDT_1m_20260417_20260717.csv --plot reports/oos.png
 
-# 4. (Optional) paper trade on the testnet
+# 4. The validation battery over every downloaded symbol of the window
+#    (bootstrap CIs, deflated Sharpe, independent decisions, verdict)
+python scripts/download_data.py --symbols NEARUSDT ETHUSDT SOLUSDT BTCUSDT --start 2026-04-17 --end 2026-07-17
+near-bot validate --start 2026-04-17 --end 2026-07-17 --windows 30:10   # -> reports/validate.md
+#    (91 days fit only the 30d/10d variant; the default also runs 90d/30d)
+
+# 5. (Optional) paper trade on the testnet — the overlay starts DISARMED
 cp .env.example .env   # paste testnet keys from testnet.binance.vision
 export $(cat .env | xargs)
 near-bot test-connection
+near-bot arm --note "why a directional move is plausible now"
+near-bot status        # overlay state + BTC/ETH regime context
 near-bot paper
 ```
+
+The journal and overlay state live in `state/` (gitignored). **Back it up** — the
+journal is the only record of the human's track record, and it is append-only.
 
 A custom parameter grid for walk-forward can be supplied as YAML:
 
@@ -164,6 +197,10 @@ src/near_bot/
 ├── score.py        # the composite conviction score + regime gates
 ├── backtest.py     # hysteresis loop, vol-target sizing, per-bar MTM accounting
 ├── walkforward.py  # Sharpe selection, top-k ensemble, embargo option
+├── overlay.py      # kill-switch ladder, transition cooldown, risk sizing (pure)
+├── journal.py      # append-only decision journal + accuracy report
+├── stats.py        # block bootstrap, deflated Sharpe, independent-decision counting
+├── validate.py     # the validation battery behind `near-bot validate`
 ├── report.py       # equity vs buy&hold, drawdown, exposure, return plots
 ├── dump_client.py  # data.binance.vision public dumps (no key, no geo-block)
 ├── broker.py       # Binance spot wrapper (paginated klines, lot-size, min-notional)
@@ -177,8 +214,8 @@ Every trading decision flows through the same `score.compute()` +
 ## Development
 
 ```bash
-pytest -q                              # 32-test suite
-ruff check src tests                   # lint
+pytest -q                              # 118-test suite, offline
+ruff check src tests                   # lint (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py    # regenerate parity fixtures
 node experiments/parity_check.js       # JS engine == Python engine
 ```
@@ -193,12 +230,14 @@ The gap between "interesting" and "believable" is entirely statistical, and name
 so it isn't hidden:
 
 - [ ] **Multi-year data** across several regimes, with fixed, dated windows so a run
-      is exactly reproducible (not a rolling "last 90 days").
-- [ ] **Bootstrapped confidence intervals** on OOS Sharpe and expectancy, plus a
+      is exactly reproducible (not a rolling "last 90 days"). *Machinery done*
+      (`--start/--end` windows, monthly dumps, manifests, gap detection); the
+      multi-year run itself is still to do.
+- [x] **Bootstrapped confidence intervals** on OOS Sharpe and expectancy, plus a
       **deflated Sharpe ratio** (Bailey–López de Prado) to charge for the number of
-      configurations tried.
-- [ ] **Report independent decisions, not ensemble legs** — deduplicate correlated
-      trades so the count reflects real degrees of freedom.
+      configurations tried — `near-bot validate`.
+- [x] **Report independent decisions, not ensemble legs** — deduplicate correlated
+      trades so the count reflects real degrees of freedom (N_eff in every report).
 - [ ] **Ablation table**: each score component alone vs. the ensemble, to show the
       order-flow term earns its place.
 - [ ] **Paper-trading log**: forward testnet fills over time — worth more than any backtest.

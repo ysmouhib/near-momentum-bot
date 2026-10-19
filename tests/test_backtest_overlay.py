@@ -127,6 +127,50 @@ def test_daily_halt_blocks_rest_of_day_only():
     assert t2.weight == 0.006 / (3.0 / 95.0)  # stop distance priced off 95
 
 
+def test_armed_series_rearm_after_full_stop_resumes_with_cooldown():
+    """Full stop at bar 3 (21:00), human disarms at bar 5 and re-arms at
+    bar 6 (00:00, a new UTC day, so the -12% day's halt has lifted): the
+    re-arm sticks (no re-stop at -12% from HWM) and the next entry is sized
+    at tier 0.5 x cooldown 0.5 of the 0.40 cap = 0.10."""
+    cfg = _cfg(theta_in=0.25, theta_out=0.0, max_hold_bars=10**9,
+               target_vol=1e9, min_weight=0.0)
+    cfg.costs.taker_fee = 0.0
+    cfg.costs.slippage = 0.0
+    opens = [99.0, 99.5, 100.0, 69.0] + [70.0] * 8
+    closes = [99.5, 99.8, 100.0, 70.0] + [70.0] * 8
+    frame = _manual_frame(opens, closes, atr=0.1, start="2026-01-01 18:00")
+    score = pd.Series([np.nan, 0.5] + [0.3] * 10)
+    armed = pd.Series([True] * 5 + [False] + [True] * 6)
+    res = bt.run(frame, cfg, score=score, overlay=cfg.overlay, armed=armed)
+
+    assert res.metrics["n_full_stops"] == 1
+    assert len(res.trades) == 2
+    t1, t2 = res.trades
+    assert t1.reason_out == "full_stop" and t1.weight == 0.40
+    assert str(t2.entry_time) == "2026-01-02 01:00:00"  # signal at the re-arm bar
+    assert t2.m_tier == 0.5 and t2.m_cooldown == 0.5
+    assert abs(t2.weight - 0.10) < 1e-12
+    assert res.metrics["n_blocked_entries"] == 2  # stopped bar 4, disarmed bar 5
+
+
+def test_armed_before_false_makes_first_arm_a_transition():
+    cfg = _cfg(theta_in=0.25, theta_out=0.0, max_hold_bars=10**9,
+               target_vol=1e9, min_weight=0.0)
+    cfg.costs.taker_fee = 0.0
+    cfg.costs.slippage = 0.0
+    opens = [99.0, 99.5, 100.0, 104.0, 110.0]
+    closes = [99.5, 99.8, 102.0, 105.0, 109.0]
+    score = pd.Series([np.nan, 0.5, 0.3, -0.1, np.nan])
+    armed = pd.Series([True] * 5)
+    steady = bt.run(_manual_frame(opens, closes), cfg, score=score,
+                    overlay=cfg.overlay, armed=armed)
+    fresh = bt.run(_manual_frame(opens, closes), cfg, score=score,
+                   overlay=cfg.overlay, armed=armed, armed_before=False)
+    assert steady.trades[0].weight == 0.2 and steady.trades[0].m_cooldown == 1.0
+    assert fresh.trades[0].m_cooldown == 0.5
+    assert abs(fresh.trades[0].weight - 0.1) < 1e-12
+
+
 def test_full_stop_flattens_and_blocks_thereafter():
     cfg = _cfg(theta_in=0.25, theta_out=0.0, max_hold_bars=10**9,
                target_vol=1e9, min_weight=0.0)

@@ -1,7 +1,8 @@
 # DESIGN.md — "Trend Rider": v2 engine + human permission layer + risk overlay
 
-Status: **design only — no code has been changed.** This document is the
-implementation contract for hardening the v2 research framework into a
+Status: **implemented through step 5 except the regime sweep** (progress per
+step in §11; the multi-year validation run itself has not been done yet).
+This document is the implementation contract for hardening the v2 research framework into a
 production single-bot system. It is written to be argued with, in the same
 spirit as `docs/STRATEGY.md`: every claim here is checkable against the repo,
 and every number the system will ever report must survive the validation
@@ -652,16 +653,28 @@ Ordered roughly by "most likely to be the actual obituary":
 
 Order (each step shippable and green on its own):
 
-1. Phase A data (§3) + gap detection + tests.
+1. Phase A data (§3) + gap detection + tests. — *done*
 2. `stats.py` + `journal.py` + `arm`/`disarm`/`journal report`/`status` CLI
    (usable immediately on the testnet — measurement starts before the
-   overlay exists).
-3. `overlay.py` + `backtest.py` overlay path + hand-computed tests.
-4. Executor integration + restart reconciliation.
+   overlay exists). — *done*
+3. `overlay.py` + `backtest.py` overlay path + hand-computed tests. — *done*
+4. Executor integration + restart reconciliation. — *done*
 5. `near-bot validate` battery (multi-year, multi-symbol, bootstrap, DSR,
-   N_eff) and `experiments/regime_sweep.py`.
+   N_eff) and `experiments/regime_sweep.py`. — *validate done; regime sweep pending*
 6. Docs sweep (AGENTS.md, README, DEPLOY) and the simulator's
-   "signal engine only" note.
+   "signal engine only" note. — *done*
+
+Implementation notes (decisions the text above left open):
+
+- **Leaving STOPPED re-anchors the full stop.** After a −10% flatten the
+  account sits *at* the stop line, so measured from the old HWM any re-arm
+  would re-stop on the next evaluation. Any human call out of STOPPED
+  (`arm` or `disarm`) therefore measures the full stop from the equity at the
+  next evaluation until equity makes a new high; the half-size tier keeps
+  using the true HWM, which yields §4.3's composed tier × cooldown example.
+- **`armed` edges are human calls in the backtester.** False→True runs
+  `overlay.arm` (cooldown, lifts STOPPED) and True→False `overlay.disarm`;
+  `armed_before` gives the permission just before the first bar.
 
 Explicitly deferred (named so they are not silently done): JS port of the
 overlay and browser-simulator parity for overlay paths; promoting BTC

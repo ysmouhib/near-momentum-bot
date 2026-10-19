@@ -19,7 +19,9 @@ dependencies = [
 [project.optional-dependencies]
 live = ["python-binance>=1.0.19"]
 plot = ["matplotlib>=3.7"]
-dev = ["pytest>=8.0", "ruff>=0.6"]
+# ruff is pinned exactly: its default rule set grows between releases, and an
+# unpinned linter turns a passing CI red without a line of code changing.
+dev = ["pytest>=8.0", "ruff==0.17.1"]
 
 [project.scripts]
 near-bot = "near_bot.cli:main"

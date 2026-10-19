@@ -116,6 +116,67 @@ def test_full_stop_requires_human_rearm():
     assert s.cooldown_left == p.cooldown_trades_after_arm
 
 
+def test_rearm_after_full_stop_sticks_and_composes_with_tier():
+    """The flattened account sits below the stop line; a re-arm must not
+    re-stop on the next bar, and trades at tier x cooldown = 0.25."""
+    p = _p()
+    s = _armed_state(p)
+    ov.evaluate(s, p, equity=1.0, date_str="2026-03-01")
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-01")
+    assert s.state == ov.STOPPED
+    ov.arm(s, p)
+    events = ov.evaluate(s, p, equity=0.88, date_str="2026-03-02")
+    assert s.state == ov.ARMED
+    assert not any(e == "auto_full_stop" for e, _ in events)
+    assert s.half_tier  # still -12% from the true HWM
+    assert ov.multiplier(s, p) == pytest.approx(0.25)
+    # -5% from the re-arm equity: still trading
+    ov.evaluate(s, p, equity=0.88 * 0.95, date_str="2026-03-03")
+    assert s.state == ov.ARMED
+    # -11% from the re-arm equity: the stop works again, from the new anchor
+    events = ov.evaluate(s, p, equity=0.88 * 0.89, date_str="2026-03-04")
+    assert s.state == ov.STOPPED
+    assert any(e == "auto_full_stop" for e, _ in events)
+
+
+def test_stop_disarm_arm_does_not_lock_out():
+    p = _p()
+    s = _armed_state(p)
+    ov.evaluate(s, p, equity=1.0, date_str="2026-03-01")
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-01")
+    ov.disarm(s)  # human acknowledges the stop first...
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-02")
+    assert s.state == ov.DISARMED
+    ov.arm(s, p)  # ...and re-arms later
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-03")
+    assert s.state == ov.ARMED
+
+
+def test_legacy_state_file_measures_stop_from_hwm(tmp_path):
+    import json
+
+    path = tmp_path / "overlay_state.json"
+    path.write_text(json.dumps({"state": "armed", "hwm": 1000.0,
+                                "day_start_equity": 1000.0,
+                                "day_start_date": "2026-03-01"}))
+    s = ov.load_state(path)
+    assert s.rearm_peak is None  # pre-fix files keep the plain HWM rule
+    ov.evaluate(s, _p(), equity=890.0, date_str="2026-03-01")
+    assert s.state == ov.STOPPED
+
+
+def test_rearm_anchor_reverts_to_hwm_at_new_high():
+    p = _p()
+    s = _armed_state(p)
+    ov.evaluate(s, p, equity=1.0, date_str="2026-03-01")
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-01")
+    ov.arm(s, p)
+    ov.evaluate(s, p, equity=0.88, date_str="2026-03-02")
+    assert s.rearm_peak == pytest.approx(0.88)
+    ov.evaluate(s, p, equity=1.02, date_str="2026-03-03")  # new equity high
+    assert s.rearm_peak is None and s.hwm == pytest.approx(1.02)
+
+
 def test_multipliers_compose_with_floor():
     p = _p()
     s = _armed_state(p)
