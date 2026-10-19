@@ -1,5 +1,9 @@
 # Strategy v2: score-ensemble trend following with volatility targeting
 
+> **Status (Oct 2026):** this document is the design rationale, argued on the original 91-day sample.
+> The multi-year validation verdict lives in [`reports/validate.md`](../reports/validate.md) and [`reports/plateau_hunt.md`](../reports/plateau_hunt.md):
+> not distinguishable from noise; the parameter search converged toward market exposure; the holdout stays sealed.
+
 This document is the full reasoning behind v2: the failure analysis of v1 on real
 data, the design that the evidence forced, and the validation protocol. It is
 written to be argued with — every claim is reproducible from this repo.

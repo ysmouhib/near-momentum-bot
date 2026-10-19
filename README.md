@@ -110,12 +110,15 @@ I put a standard error on the headline before anyone else has to:
 - **Buy & hold beat it on raw return** (+38.2% over the same windows) with far larger
   drawdowns; the strategy was invested only ~30% of the time.
 
-**Conclusion I actually stand behind:** on the only data tested, the v1 scalper is
-*decisively* dead (−82%, a robust finding), and v2 is *not distinguishable from noise*
-at this sample size. To claim v2 has an edge you would need multi-year data with
-bootstrapped confidence intervals and a deflated Sharpe — the [roadmap](#roadmap-—-what-would-make-the-numbers-trustworthy)
-says exactly this. The deliverable here is the machinery and the discipline to reach
-that conclusion honestly, not the +10.7%.
+**Conclusion I actually stand behind:** the v1 scalper is *decisively* dead (−82%, a
+robust finding). The multi-year data, bootstrapped confidence intervals and deflated
+Sharpe this 91-day sample lacked now exist, and they did not change the answer: on
+NEAR/ETH/SOL/BTC from 2021-01 to 2026-09 every validation block is *not distinguishable
+from noise* ([`reports/validate.md`](reports/validate.md)), and a pre-registered
+parameter search converged toward market exposure and trails buy-and-hold
+([`reports/plateau_hunt.md`](reports/plateau_hunt.md)) — so the holdout was left
+unfired. The deliverable here is the machinery and the discipline to reach that
+conclusion honestly, not the +10.7%.
 
 ![Walk-forward out-of-sample on real data](docs/img/walkforward_real.png)
 

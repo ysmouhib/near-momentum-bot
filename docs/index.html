@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>near-momentum-bot v2 — honest validation of a trend engine</title>
-<meta name="description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'.">
+<meta name="description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="near-momentum-bot v2">
 <meta property="og:title" content="near-momentum-bot v2 — honest validation of a trend engine">
-<meta property="og:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'. Try the browser simulator.">
+<meta property="og:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols. Try the browser simulator.">
 <meta property="og:url" content="https://ysmouhib.github.io/near-momentum-bot/">
 <meta property="og:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="near-momentum-bot v2 — honest validation of a trend engine">
-<meta name="twitter:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise yet'.">
+<meta name="twitter:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols.">
 <meta name="twitter:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -110,10 +110,12 @@
     <h1>An honest account of what a trend engine <em>can and cannot prove</em>.</h1>
     <p class="lede">This project exists to demonstrate <b>cost-aware backtesting and walk-forward
     validation done honestly</b> — including the part where the honest answer is "not
-    distinguishable from noise yet." Its one robust finding: on 91 days of real data, the v1
+    distinguishable from noise." Its one robust finding: on 91 days of real data, the v1
     4-minute scalper <b>lost 82% out-of-sample</b> — the edge never survived 0.24% round-trip
     costs. v2 is the disciplined response: a slower, volatility-targeted trend engine, evaluated
-    with the statistical caution the small sample demands.</p>
+    with the statistical caution the small sample demands. <b>On six years of data across four
+    symbols, the honest answer stayed the same</b> — <a href="#multi-year">the multi-year
+    verdict</a>.</p>
     <div class="actions">
       <a class="btn solid" href="simulator.html">Run it on real data, in your browser</a>
       <a class="btn line" href="https://github.com/ysmouhib/near-momentum-bot">Source on GitHub</a>
@@ -132,8 +134,9 @@
   <div class="wrap">
     <h2>Validation discipline, not a performance claim</h2>
     <p class="prose"><b>Read this as a worked example of honest evaluation, not as evidence that
-    this strategy makes money.</b> The sample is far too small to conclude anything — the most
-    useful thing this page does is show <em>how to see that</em>, rather than hide it.</p>
+    this strategy makes money.</b> The 91-day sample below is now the trailer, not the movie: far
+    too small to conclude anything on its own, it stays here to show <em>how to see that</em>,
+    rather than hide it. The movie — six years, four symbols — follows the caveats.</p>
     <p class="prose" style="margin-top:10px">Setup: 91 days of real NEARUSDT 1-minute data
     (mid-April → mid-July 2026), aggregated to 60-minute bars, with Binance taker fees
     (0.10%/side) and slippage (0.02%/side) charged on every fill. Walk-forward re-optimises a
@@ -172,12 +175,61 @@
       larger drawdowns; the strategy was invested only ~30% of the time.</li>
     </ul>
 
+    <h3 id="multi-year" style="margin-top:34px">Six years later: the multi-year verdict</h3>
+    <p class="prose">The caveats above named what a real claim would need: multi-year data,
+    bootstrapped confidence intervals and a deflated Sharpe ratio. That run is done — NEAR, ETH,
+    SOL and BTC 1-minute klines from <b>2021-01-01 to 2026-09-30</b> (SHA-256-verified Binance
+    dumps), walk-forward on two window sizes, 10,000-resample block-bootstrap confidence
+    intervals, independent decisions counted, and a deflated Sharpe charged against the trials
+    ledger. <b>All ten symbol × window blocks: not statistically distinguishable from
+    noise.</b></p>
+    <table class="res">
+      <thead><tr><th>Walk-forward OOS, 2021–2026</th><th>Sharpe, 90d/30d windows [95% CI]</th><th>Sharpe, 30d/10d windows [95% CI]</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>NEARUSDT (production)</td><td>+0.35 [−0.50, +1.17]</td><td>+0.53 [−0.27, +1.28]</td><td>noise</td></tr>
+        <tr><td>ETHUSDT</td><td>+0.27 [−0.62, +1.13]</td><td>+0.42 [−0.47, +1.29]</td><td>noise</td></tr>
+        <tr><td>SOLUSDT</td><td>+0.47 [−0.37, +1.26]</td><td>+0.75 [−0.12, +1.58]</td><td>noise</td></tr>
+        <tr><td>Pooled NEAR + ETH + SOL</td><td>+0.49 [−0.35, +1.30]</td><td>+0.74 [−0.11, +1.56]</td><td>noise</td></tr>
+        <tr><td>BTCUSDT (context stream)</td><td class="neg">−0.20 [−1.20, +0.75]</td><td>+0.36 [−0.56, +1.24]</td><td>noise</td></tr>
+      </tbody>
+    </table>
+    <p class="caption">Every confidence interval includes zero. Independent decisions per block:
+    320–459; engine max drawdowns −26% to −48%. Full report:
+    <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/reports/validate.md">reports/validate.md</a>.</p>
+    <p class="prose" style="margin-top:16px">The obvious next question — could better parameters
+    rescue it? — got a <b>pre-registered</b> answer: 125 configurations on 2021–2024
+    (NEAR/ETH/SOL), with the grid, the selection rule and the trials-ledger charge committed
+    before any configuration was scored. It selected the corner cell
+    <code>theta_in=0.15, trail_atr=4.0, er_min=0.1</code>: in-sample Sharpe +1.13 [95% CI +0.15,
+    +2.07], but a deflated-Sharpe probability of 0.69 against the required 0.95 after charging
+    for 219 configurations — <b>not established</b>. The corner is the tell: the search converged
+    toward the loosest filters, i.e. toward more time in the market, and on the same bars it
+    trails plain buy-and-hold.</p>
+    <table class="res">
+      <thead><tr><th>2021–2024, pooled equal weight</th><th>Selected cell</th><th>Buy &amp; hold</th></tr></thead>
+      <tbody>
+        <tr><td>Sharpe</td><td>+1.13</td><td>+1.32</td></tr>
+        <tr><td>Total return</td><td>+150%</td><td>+2472%</td></tr>
+        <tr><td>Max drawdown</td><td>−30%</td><td>−89%</td></tr>
+        <tr><td>Exposure · correlation with buy &amp; hold</td><td>39% · +0.58</td><td>100% · —</td></tr>
+      </tbody>
+    </table>
+    <p class="caption">Post-hoc descriptive context, not used for selection. Lower Sharpe than
+    buy-and-hold on every symbol, with a much shallower drawdown at ~39% exposure: a partially
+    invested version of the same market exposure, not timing skill. Full report:
+    <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/reports/plateau_hunt.md">reports/plateau_hunt.md</a>.</p>
+    <p class="prose" style="margin-top:16px">The holdout (2025-01-01 → 2026-09-30) was
+    <b>deliberately not fired</b>: a selection that fails its own pre-registered gate does not get
+    to spend it. It stays sealed for a future strategy family — as a <em>viewed</em> holdout, not
+    a pristine one, since those months are part of the validation run above.</p>
+
     <div class="callout">
       <span class="lbl">The conclusion actually defended</span>
-      <p>On the only data tested, the v1 scalper is <b>decisively dead</b> (−82%, a robust
-      finding), and v2 is <b>not distinguishable from noise</b> at this sample size. Claiming an
-      edge would need multi-year data, bootstrapped confidence intervals and a deflated Sharpe
-      ratio.</p>
+      <p>The v1 scalper is <b>decisively dead</b> (−82% out-of-sample, a robust finding). v2 is
+      <b>not distinguishable from noise</b> — first on 91 days, then on six years across four
+      symbols, with the bootstrapped confidence intervals and deflated Sharpe the 91-day sample
+      lacked. A pre-registered search for better parameters converged toward market exposure and
+      trails buy-and-hold.</p>
       <p>The deliverable here is the machinery — and the discipline to reach that conclusion
       honestly — not the +10.7%.</p>
     </div>
@@ -237,18 +289,32 @@
 <section id="quickstart">
   <div class="wrap">
     <h2>Reproduce every number</h2>
-    <pre><span class="c"># install</span>
-git clone https://github.com/ysmouhib/near-momentum-bot.git && cd near-momentum-bot
+    <pre>git clone https://github.com/ysmouhib/near-momentum-bot.git
+cd near-momentum-bot
 pip install -e ".[dev,plot]"
 
-<span class="c"># download 90 days of real 1m data (no API key; uses Binance's public dumps)</span>
-python scripts/download_data.py --symbol NEARUSDT --days 90
+<span class="c"># 1. Download a fixed window of real 1m klines (no API key; Binance public dumps)</span>
+python scripts/download_data.py --start 2026-04-17 --end 2026-07-17
 
-<span class="c"># fixed-config backtest</span>
-near-bot backtest --csv data/klines_1m.csv --trades --plot reports/backtest.png
+<span class="c"># 2. Fixed-config backtest (optimistic upper bound)</span>
+near-bot backtest --csv data/NEARUSDT_1m_20260417_20260717.csv --trades --plot reports/backtest.png
 
-<span class="c"># the number that matters: walk-forward out-of-sample</span>
-near-bot walkforward --csv data/klines_1m.csv --plot reports/oos.png</pre>
+<span class="c"># 3. Walk-forward validation (the number that actually matters)</span>
+near-bot walkforward --csv data/NEARUSDT_1m_20260417_20260717.csv --plot reports/oos.png
+
+<span class="c"># 4. The validation battery over every downloaded symbol of the window</span>
+<span class="c">#    (bootstrap CIs, deflated Sharpe, independent decisions, verdict)</span>
+python scripts/download_data.py --symbols NEARUSDT ETHUSDT SOLUSDT BTCUSDT --start 2026-04-17 --end 2026-07-17
+near-bot validate --start 2026-04-17 --end 2026-07-17 --windows 30:10   <span class="c"># -&gt; reports/validate.md</span>
+<span class="c">#    (91 days fit only the 30d/10d variant; the default also runs 90d/30d)</span>
+
+<span class="c"># 5. (Optional) paper trade on the testnet — the overlay starts DISARMED</span>
+cp .env.example .env   <span class="c"># paste testnet keys from testnet.binance.vision</span>
+export $(cat .env | xargs)
+near-bot test-connection
+near-bot arm --note "why a directional move is plausible now"
+near-bot status        <span class="c"># overlay state + BTC/ETH regime context</span>
+near-bot paper</pre>
     <p class="prose" style="margin-top:14px">Or skip the terminal entirely: the
     <a href="simulator.html">browser simulator</a> runs the same engine (parity-checked
     trade-for-trade against the Python code) on live Binance data, with every parameter adjustable —
