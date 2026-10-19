@@ -1,0 +1,542 @@
+{
+  "symbol": "BTCUSDT",
+  "start": "2021-01-01",
+  "end": "2026-10-01",
+  "files": [
+    {
+      "name": "BTCUSDT-1m-2021-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "9364a063efa0604d5b9d2536fb68f922da5afa3d8f94a26a527471a1e2f87801",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-02.zip",
+      "source": "monthly",
+      "rows": 40241,
+      "sha256": "21723e4951ba30037cb8417278b7cf4a38d47c625b1cb5ac97864d539ae6d407",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-03.zip",
+      "source": "monthly",
+      "rows": 44550,
+      "sha256": "54387ec23e27440b220c693b94e97c21dbb3a82d3b7606fd8cfe9f40a69cc85b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-04.zip",
+      "source": "monthly",
+      "rows": 42766,
+      "sha256": "016ea34ee7e52c4783c1e03ec65c710361c1ccf228d3a4c0b44a4d0baa859641",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "afed5ec95ede42509edb5ffce2d64c4af0916cac9878df99b8bb15c8e7d1488a",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "29ff5a78be8701d67376d480041f93957f5d26b3435c9feb48001a77ac973c62",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b7befce6203924e3c782ad19859bbe7d4fe38a2bd2d525101235cc6fc6fc10a8",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-08.zip",
+      "source": "monthly",
+      "rows": 44370,
+      "sha256": "8e886c3aeb7eb625493e875bfaf181eeb5a316dad424c86d042ad2c73cad563b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-09.zip",
+      "source": "monthly",
+      "rows": 43080,
+      "sha256": "27edb4a4623701ba3c5b3f6d4de1848964abb31188036236827fd28cf9bdb853",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "aad7e2fa6d48c33098b61ac5f7dbbbb4d4234222b5a5ebb4e9b1bbced7670f3f",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "cb4cf36e1590663a803b28261189a719fd00bc1d8eef672378df02a934862df2",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2021-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "2b6c79547da2d87e6735d29fcb2d75f0e15c9cbfcec6396c8d8f20b3632d8e0b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "ce0e16e834331e70b3041677c7f409818d5904bb59cb7b880695e4cacd34fc09",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "748844587c78902e4c35886620197053ee39f3e7104fbdcbfde00fe829bbfd1a",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "f8a05f6657cb7f8ac41c047bae65bff74703f058f56517dca28a817d390b82d3",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "6e840c81076ac25e6acdbfe4aaeb7aa8b1895a70d8111a3c2908c5134072f097",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "154311f08aa264e233b0c7b472aa490c8cfd1b6083ba86cf6c18134e50536b89",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "0ced8899e9c3b2c098e1c5fc4993250bac22d8684d2d38404310351f35e32c0c",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b7b9100066d75037063d0798b91fab91d62c348a21888ace2363a75a6089e7cc",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7517a604803c40cd38b29fb490d7bce83d01e1e4ac9e9ae2bcd52adaea55a291",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "72b22ae8bbb91342c672c2915680729ce2e7223d21386de08d4af906e6bb0713",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5c9497d81e565c88256b1b17e86bc7257fc1f4a133ec50109c6a5a9bbd180f3f",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "7b7463638505f303ea91ababadff27bbb46c6d448428f99288f5faf790250a71",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2022-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "38f93ad56a5f13491094b0ef965f03cea2d6097cc72b7179489b7d60d5fd446b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "664116c2f33465d191684887f0d4834c02eb0a2635ada43eca855a99e6b6b0c5",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "bff03104aa247f791a12a122336cb8c928e19fea5b74276d83a248878b9a619a",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-03.zip",
+      "source": "monthly",
+      "rows": 44560,
+      "sha256": "5591171a15f210af647a2fb68ab8cbad45a3a595cfe9a0eec9d06e5e84928bec",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "c71baedea84f9fc1a0ad297b383505b1cb84c0a7fc111caa149aa6fb2defa5da",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c83bd079dc67b9e542d07fe9491f8b1bf513185d6d7cc4ce17710f21c8d0037b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "d8cf5d1817fa1d8cba8eaf4d189614cf05b15d7233e9e29a0156d2dee2cfaad1",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "8f32a4ef47bd758b33bfaf680a71792f8d97ca4d89ae55ff3d2272cc3974560c",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b4d775d24d905660d8ad00bfa1fc0157ec83c4b4f0c4aacca8818dad5d17c6c6",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "22333eaa3f971ad0686c02532b7b23d02e5e32c298d9bf4fa55894fbb755da99",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "9e854972545806398d124571916348238ce39961072730c200cca3c2e0bd50a3",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "4b1462878f31fd736385b761f6bb0a3f525936a6ae9f5f52c3e3b95ee2df35b4",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2023-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c8b684a66b5ddbb58bf116251359c2dd83a07ce46791f4caa16dd4301eb17636",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "40b78258091a468f8756843f207f5913eafc1d6e756c40a78711320d93fa5e75",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-02.zip",
+      "source": "monthly",
+      "rows": 41760,
+      "sha256": "431132e0db8b9fe6e5c93c8e9ba3ae37dbcfa0edcdd57618b1b78ac18d14be79",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "a9af86295eae839f1d072643c67eed7fcc47bb1d82c12ef312d041eec9511e7b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "753040cbfaa72bf9b1fdc6253a3b521a9a174a664dfd0929a556be327b016bc6",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "0f709143f66a09acc430d24a5f27f9accd52689c23ce10f2c0b6ea26997bfa8a",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "90f4fc3f55918787848c71f4cd0f2f1a5851bbffaf6392e76e9ab555b7479d2b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "9cfd749fd2027a0c6f261bed607b49dd1256369fb41b784934544a3676f8162e",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "6a1cac2a5482132dc5a030534aa028e2becc560877f2b93b7add90194f576c42",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "1e30f6091b05eeb7b0449735d749354b81ab429ab1449bae82a21e316db8eac3",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "13f7f9f9bed652fd152422246cfbcaefa6223692c5c37fb3ca4e72f45501e607",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "c30a63bd0e8a77f2d18a2a019272b907f29a84fd5378796cf9333b041edcb12b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2024-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "58fef0b7c7abce7a0201efd04ed3732f236f607f3fcecf228fb8384cad1ae2c1",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "8d028b2f91aad57d6b693d44449c93f9c4b7044f55f298c8a3ac40ab676dafac",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "26b3795072983a66bdbe8327e0d5e71069bdd5ca831d4da3850ba68ef7a991ef",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "e333601b6c721434f3cdd6670ffde2371bef7946572864c49ba6431a690ab1ca",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "4103d48887f9f5ec04144b190314ec31db9e3094674e5d53a3436b338854848f",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7f95bf97e3ccfbb55cd002f124a54dc1726ced7cfd54e6fd200e59845ca95d5c",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "f95f6169e253d38fb321c87984c827878634250cdcc3ff84fc3507f036bcabbd",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "3377e023fe252418cfaf46c9e23b3f0d1e56fb2fd89b4191fc66262b947a0ee2",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "11da1c7db8949cbdcbb757531756eda55f2a3d663cfac671c5d1a8a87911318f",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "52bb4a4a52afbcc0af77e3eb92c114bf810982ca63bf02f8fe15062e59c5f44b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "985d878cacbfdde85c9e0da2e8830ab913fe01bfdcde6e488563d8194df11f6b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "c54159d1216ab07f040a96d6678748e8746ac4200cba373fb6b758f2cdd1e5e5",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2025-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7b47647352b01356dcd678a1438efb8baac03ed798785ed2179d428aab0cca9b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d28b369da32a6ea84ba0af517b1847ab67b2fcc1e0e111c1b24d56ae07240cb9",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "cee2e913ed07e02834e2387c65ca430fe3576f620588bad8a02229238f385407",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "a2c1e689d39aa7877e218f436f15162e9a4436778a377d32e9d9b81b081381cd",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "318afd4f5acfbcfbb40fbe727a77eee8e9e7b54d8941589c78a32283d90b4a01",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "62983d93c35e26ec6c29116c629e443b7ddfe3d301aca83331ff58112199d8d0",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "c8e1d5e70b766dd2312fc9cd7085785bb25708e27e75c21a5a5aaba61a6d07f5",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "3ef15c84353da48e1c7c5fd99b9751cb036bf8986ed47f7cd1be63359c0d4f6b",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "acab442e02745177063031d402929703ae983715010064b40cf811c4beb843d4",
+      "sha256_verified": true
+    },
+    {
+      "name": "BTCUSDT-1m-2026-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "7a021fb5981cfdb1a56457d68fa81360ab27350c981ddfe63112b2322df44b56",
+      "sha256_verified": true
+    }
+  ],
+  "missing_days": [],
+  "missing_months": [],
+  "pre_listing": [],
+  "rows": 3021487,
+  "first_bar": "2021-01-01 00:00:00",
+  "last_bar": "2026-09-30 23:59:00",
+  "gaps": [
+    {
+      "start": "2021-02-11 03:41:00",
+      "end": "2021-02-11 04:59:00",
+      "missing_bars": 79,
+      "allowed": false
+    },
+    {
+      "start": "2021-03-06 02:00:00",
+      "end": "2021-03-06 03:29:00",
+      "missing_bars": 90,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-20 02:00:00",
+      "end": "2021-04-20 04:29:00",
+      "missing_bars": 150,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-25 04:01:00",
+      "end": "2021-04-25 08:44:00",
+      "missing_bars": 284,
+      "allowed": false
+    },
+    {
+      "start": "2021-08-13 02:00:00",
+      "end": "2021-08-13 06:29:00",
+      "missing_bars": 270,
+      "allowed": false
+    },
+    {
+      "start": "2021-09-29 07:00:00",
+      "end": "2021-09-29 08:59:00",
+      "missing_bars": 120,
+      "allowed": false
+    },
+    {
+      "start": "2023-03-24 12:40:00",
+      "end": "2023-03-24 13:59:00",
+      "missing_bars": 80,
+      "allowed": false
+    }
+  ],
+  "allowed_gaps": [],
+  "republished": []
+}

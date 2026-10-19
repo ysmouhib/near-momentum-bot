@@ -1,0 +1,542 @@
+{
+  "symbol": "SOLUSDT",
+  "start": "2021-01-01",
+  "end": "2026-10-01",
+  "files": [
+    {
+      "name": "SOLUSDT-1m-2021-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "121e95af1805bab76597aa9cea9cf355c6247934f3633232cd00ad99c8bd7b5f",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-02.zip",
+      "source": "monthly",
+      "rows": 40241,
+      "sha256": "23b53a1104212796ae2131aa8f59a91723df9d36066c236d6ced2335f9b4a695",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-03.zip",
+      "source": "monthly",
+      "rows": 44550,
+      "sha256": "e79a7bb8413f7a08b9c940775d9035deee676469d21a2338a6d00b487c08ad54",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-04.zip",
+      "source": "monthly",
+      "rows": 42766,
+      "sha256": "b84c08a84d759dc40e7a5cebad239ff797b9ac80fce02e01a3af56287d9bbc2a",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "1ca37f57c3ea7d5997521a48bbc322906271246496840da31f97ac476733f39b",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "5bddd840527d5d58af1b5b32cab2593274aa6ff5bd9ba1d39e8068f37997ff12",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "444cb0666f3316c02a81dc6fe98092b31ad044f359b8c968ad5eba8d70c9a0f1",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-08.zip",
+      "source": "monthly",
+      "rows": 44370,
+      "sha256": "7dcee841a8a512f4aab0cb72986c41621f1aed09d16c3677d5c8b960013bad84",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-09.zip",
+      "source": "monthly",
+      "rows": 43080,
+      "sha256": "f1ef01c54bacaa75a07c3a79a9116f842a065ffb13557cee7b5c10537a7ce923",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "db0ed5fe0c133890f0784695c4eaf1b6009af181f03420658bc19ffdcd91e37d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "9864800c8ca57af49991ef0bd216e8c3667bea21f696ef755e71a5ed8d0dbc2d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2021-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "08fc0993fd2aa0d7b844a65ceed970e84e71e4162b71ed7bee8c2f56e20bcee9",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "36b39e160ebd370251b3f5e2f43dd50af5740b9bb6ee87dfb2d91262635cccd8",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "979f4f839d8f49901f0007b561afc51534dfcf8d6b4034ea6e3fb49a55c357ab",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "ce369b69e8c3f04e70e7c7fbe52d4a5a1b21570c12db90b1a303855c1b450ce5",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "dabfe13a7f0bfa0bda6979f18521c4fbc07b2fe86378b598975f1ed13cc71215",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "e1f3bbcc6676defcef3787184bffd83ebc4ea98cead6c08c61aa8e470e7fda9b",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "fbedb1b11d77be7a439570211a1e6303ad74aa0823814d85ada158bdfbb4d87d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "55db81c4a0a6985ccaa716459d991ceb467c07fe50940fa4e706824ffbd8da13",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "a59339d42d0fb68b8a0585e6471a5f9c155e0de8d7b69252201ec194d1f04283",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "d0bb359b3245cd11a7dad5a89358d34e5a4bdf841e934d3bacab29f0b75cf58f",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "58a1ee69e1a973fced4ead4387d0271183a686f7546ab94788433da38081c6e6",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ea0ee69b4424bb70e3e8c36c589a7a782e3b7f7f7fad7bf5ae0a030c64336794",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2022-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c0437752e0ed447aa50ea7f5d32eff8e960f7d917b1ada51dc4b4b147b75a125",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "ef177ba091f6b34d0f75c4b7667eaf78d24e44022f190811c7742366fbff8423",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-02.zip",
+      "source": "monthly",
+      "rows": 40319,
+      "sha256": "c896994f054d5e9f0949638a860579242dbaad843be1a1e1fd538ace9026de69",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-03.zip",
+      "source": "monthly",
+      "rows": 44560,
+      "sha256": "d2a5434672a7f758c8d536a07645b6a499526892d605a63dbaaa96a5e32ffcee",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "0288de291fdd9bd165a0a5a1e6b82b0eefb9470de1811a0ab77d07a9a580d79d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "97690889bced2f8192be5fbc14dfc9c41256f5121e88300e420b5a7fcc65247c",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "36ab86ea112b9c247d7aa523fcbddf3cc665fb9b6cb58001cc26a0a6fbd70a44",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "e7e2c523504be768a77d54ef428010d951859d58dff2fd3c84006a7ac0b80b35",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d7488c58c41e72933ae9f86be1abcc31ab76eb7f9eeff702b9e75ea163b276a4",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "e15fe14abc6b5bdf4bec74c05b1ed38201fca62a215ac06bb822054a15e8d65d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b5430edaccfa7b58e36ac073112604231d405ff154da037055a425e20ec04e6a",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "d10bd1154fa04501578767be679b87d203f950db5168e4d2f08a4adbef18ea93",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2023-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "335a0559f1002c6df42ab766f10536fa59e0f1dcc1f1b1b2075e2b36e9e1b310",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "8cd5f9de14cfc4df6be0ca8d3a31312dfcb73e8708a43bd0771f72362e6801a1",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-02.zip",
+      "source": "monthly",
+      "rows": 41760,
+      "sha256": "98634ed346b2033d13007f61d8dcf74300707336b04b84c18b700c534d57f579",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c45e24d174a27184832f9eaf51fc0a868b94b4a54ab3593f695b9c8f11c68551",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "1d00b8db8e8e7cc857f03294b62013a5359da916035569807e2b5a8c4a1ca790",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "cf7d3fdbfd054d6b04e038d8ec77b7b061aa931d6f826ce61827d9581d96c5d7",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "9306082f84656cf28fca2b873445f32307bccd0b5ea6663de77ae80b6e7df9a3",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c7b3651243e94833644c533ba80c10815281043aeaa7a76b8444f90db4746bad",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "52d6a02057c08d24eae41a53dede0d8af12b8ef8bf2306ae205593937f53264f",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "958f32e0f6ac85f101a7df60d3db315bed43e17029123916e043576219dc044c",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c815560ef2e4cbafa16f8e8c671a9aedca2fcc1553b27bcf58563164ee6df3e8",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "623bef1653fe496b04fe96c5629ab6fbb46adcd4a3f2d25d34106beed1aeffa6",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2024-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "3e9e2d3e525c4afea0d55366354af2ad839424e7104f98b40c847137a45f1376",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "17417b784a28ba659dcd6adb3598f67cc1a987ceda7e5048ce20807617d2c603",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "1a7e23c61791fe35644b464d9e464d666f3920a2dfd608890ec39b3c01cd5eef",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "092baef0e6d61a56b33ea11272651fa4e1a323e012befa67dee193c1eb39550a",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "21189f395bd5d7e15f55956139812212e9c5e329eb6eacde552cedaff2b59a6f",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7fdc3b4c5a7440f3967ccf610a50f7476ce08f8d353dbc547da27aa9597acf11",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "df0158c33ab9fc73b268f31b5af5b3c22f0be44470f821e8cccf5e99f24d8ca1",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5b7ef20e0fbc11a99f3cd5dcc677f35599723bbc85598de9bf3654a885905e52",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "ace20c6d317ff28f70b5b3684afc3ba7bc2099a98ddc6c1bde4f63db46fa571b",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "067ddd8e2e2b09f4848175ec04371b67d8c7d2ad5d37460b37cca7b24b0d0b10",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "af138c5fae53940a0da3d5af1a296a8ef22ffade83e054e4803a5d7371af3763",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "5188939b56b57813d2b39d4d5d184e0a6e3e44fc79206eb25e0c6e958cf3cb3d",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2025-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "8ff4ac3d9f3411c31a892585e6906a71df701e3febc195e1da685c244125f774",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "9d0fbac86d898a8a2b821d2856a5c282dc6b9638d8a83ef47e632edf4541e695",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "acfd300f0eabe9f1485e121222d67a03da180c539bd9e43b2afacc602f631120",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b98d056aafa1b4e188a1863855749548ac4e062f5f1002e9da353795863216bc",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "259fd7109745c47858ee133cb0e97995f8b6b40cbd0727eefd6301304bac848e",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "e5be21fb183cf534a975db77567398f4b1a567c9ed24738bfafa409b7876c6b3",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "e165365110140912f07d5e250d0e7511b1b37c93db46ce8b7bb1a2ddf06c4b04",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7980195ca8f511ca8e11d7903c0031f19cd274c034fae7f54768bf235ef64470",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "138412edb2c86df6109e0800b7b7399c6f7d2b4483d0e35ddf5921e70c0d08b6",
+      "sha256_verified": true
+    },
+    {
+      "name": "SOLUSDT-1m-2026-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "c18c258e478a84c3d87e88e2e16f17e5675bf087cb11bf789c0ae717c875ee0a",
+      "sha256_verified": true
+    }
+  ],
+  "missing_days": [],
+  "missing_months": [],
+  "pre_listing": [],
+  "rows": 3021486,
+  "first_bar": "2021-01-01 00:00:00",
+  "last_bar": "2026-09-30 23:59:00",
+  "gaps": [
+    {
+      "start": "2021-02-11 03:41:00",
+      "end": "2021-02-11 04:59:00",
+      "missing_bars": 79,
+      "allowed": false
+    },
+    {
+      "start": "2021-03-06 02:00:00",
+      "end": "2021-03-06 03:29:00",
+      "missing_bars": 90,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-20 02:00:00",
+      "end": "2021-04-20 04:29:00",
+      "missing_bars": 150,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-25 04:01:00",
+      "end": "2021-04-25 08:44:00",
+      "missing_bars": 284,
+      "allowed": false
+    },
+    {
+      "start": "2021-08-13 02:00:00",
+      "end": "2021-08-13 06:29:00",
+      "missing_bars": 270,
+      "allowed": false
+    },
+    {
+      "start": "2021-09-29 07:00:00",
+      "end": "2021-09-29 08:59:00",
+      "missing_bars": 120,
+      "allowed": false
+    },
+    {
+      "start": "2023-03-24 12:40:00",
+      "end": "2023-03-24 13:59:00",
+      "missing_bars": 80,
+      "allowed": false
+    }
+  ],
+  "allowed_gaps": [],
+  "republished": []
+}
