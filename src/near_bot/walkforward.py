@@ -138,12 +138,20 @@ def run(
     min_trades: int = 3,
     top_k: int = 3,
     embargo_bars: int = 0,
+    overlay=None,
+    armed: pd.Series | None = None,
 ) -> WalkForwardResult:
     """Run walk-forward validation over aggregated, pre-indicator ``bars``.
 
     ``train_bars``/``test_bars`` are in aggregated bars (720×60m = 30 days).
     ``top_k`` combos are traded per window and their per-bar returns averaged.
     ``embargo_bars`` inserts a gap between train and test (default 0).
+
+    ``overlay``/``armed`` are passed through to ``backtest.run`` in every
+    slice: with an overlay the in-sample ranking *and* the OOS numbers both
+    describe the system that would actually run (kill switch, risk sizing,
+    permission gating) — the what-you-backtest-is-what-you-run invariant
+    applied to validation.
     """
     grid = grid or DEFAULT_GRID
     unknown = [k for k in grid if not hasattr(cfg.strategy, k)]
@@ -174,7 +182,9 @@ def run(
 
     def run_slice(combo_cfg, frame, score, a, b):
         sub_cfg = _with_strategy(cfg, combo_cfg)
-        return bt.run(frame.iloc[a:b], sub_cfg, score.iloc[a:b])
+        sub_armed = armed.iloc[a:b] if armed is not None else None
+        return bt.run(frame.iloc[a:b], sub_cfg, score.iloc[a:b],
+                      overlay=overlay, armed=sub_armed)
 
     result = WalkForwardResult()
     result._bar_minutes = cfg.aggregate_minutes

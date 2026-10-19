@@ -142,8 +142,9 @@ def cmd_download(cfg: Config, args):
 def cmd_backtest(cfg: Config, args):
     bars = _load_bars(cfg, args.csv)
     frame = indicators.add_all(bars, cfg.strategy)
-    result = bt.run(frame, cfg)
-    print(f"\nBacktest: {cfg.symbol} {cfg.aggregate_minutes}m  ({len(frame)} bars)")
+    result = bt.run(frame, cfg, overlay=cfg.overlay if args.overlay else None)
+    print(f"\nBacktest: {cfg.symbol} {cfg.aggregate_minutes}m  ({len(frame)} bars)"
+          f"{'  [overlay ON]' if args.overlay else ''}")
     print("-" * 56)
     print(result.summary())
     if args.trades and result.trades:
@@ -179,8 +180,10 @@ def cmd_walkforward(cfg: Config, args):
         train_bars=args.train_bars, test_bars=args.test_bars,
         step_bars=args.step_bars, min_trades=args.min_trades,
         top_k=args.top_k, embargo_bars=args.embargo,
+        overlay=cfg.overlay if args.overlay else None,
     )
-    print(f"\nWalk-forward: {cfg.symbol} {cfg.aggregate_minutes}m  ({len(bars)} bars)")
+    print(f"\nWalk-forward: {cfg.symbol} {cfg.aggregate_minutes}m  ({len(bars)} bars)"
+          f"{'  [overlay ON]' if args.overlay else ''}")
     print("-" * 56)
     print(result.summary())
     if args.plot:
@@ -380,6 +383,9 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--csv", default="data/klines_1m.csv")
     b.add_argument("--trades", action="store_true", help="print sample trades")
     b.add_argument("--plot", default=None, metavar="PNG", help="save equity/drawdown plot")
+    b.add_argument("--overlay", action="store_true",
+                   help="run with the risk overlay (kill switch, R/stop sizing); "
+                        "default off keeps the pure engine (JS parity)")
 
     w = sub.add_parser("walkforward", help="walk-forward validation (out-of-sample report)")
     w.add_argument("--csv", default="data/klines_1m.csv")
@@ -395,6 +401,8 @@ def build_parser() -> argparse.ArgumentParser:
     w.add_argument("--grid", default=None, metavar="YAML",
                    help="YAML mapping of strategy param -> list of values")
     w.add_argument("--plot", default=None, metavar="PNG", help="save OOS equity plot")
+    w.add_argument("--overlay", action="store_true",
+                   help="validate with the risk overlay active (the production posture)")
 
     p = sub.add_parser("paper", help="run on testnet")
     p.add_argument("--poll", type=int, default=30)

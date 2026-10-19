@@ -42,6 +42,8 @@ class Trade:
     weighted_net: float     # net_pct * weight — contribution to portfolio
     bars_held: int
     reason_in: str = ""
+    m_tier: float = 1.0     # kill-switch size multiplier at entry (overlay)
+    m_cooldown: float = 1.0 # transition-cooldown multiplier at entry (overlay)
 
 
 @dataclass
@@ -92,17 +94,26 @@ def position_weight(vol_bar: float, bar_minutes: int, target_vol: float,
     return w if w >= min_weight else 0.0
 
 
-def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None) -> BacktestResult:
+def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None,
+        overlay=None, armed: pd.Series | None = None) -> BacktestResult:
     """Backtest over ``frame`` (output of ``indicators.add_all``).
 
     ``score`` may be precomputed (walk-forward reuses it across configs); it is
     recomputed from ``cfg.strategy`` otherwise. The frame must be sorted by
     time ascending.
+
+    ``overlay`` (an ``OverlayParams``) activates the kill-switch ladder,
+    risk-based sizing and permission gating from ``overlay.py``; ``armed`` is a
+    boolean per-bar permission series (a human or synthetic regime schedule).
+    Both default off: with neither given, the loop is byte-identical to the
+    pure engine, which is what keeps the JS parity fixtures valid.
     """
     p = cfg.strategy
     costs = cfg.costs
     if score is None:
         score = score_mod.compute(frame, p)
+    if (overlay is not None or armed is not None) and "timestamp" not in frame.columns:
+        raise ValueError("overlay/armed runs require a 'timestamp' column")
 
     rows = frame.reset_index(drop=True)
     n = len(rows)
@@ -113,31 +124,46 @@ def run(frame: pd.DataFrame, cfg, score: pd.Series | None = None) -> BacktestRes
     a_vol = rows["vol_bar"].to_numpy(dtype=float)
     a_atr = rows["atr"].to_numpy(dtype=float)
     a_score = score.to_numpy(dtype=float)
+    a_armed = (np.ones(n, dtype=bool) if armed is None
+               else armed.reset_index(drop=True).to_numpy(dtype=bool))
+    if len(a_armed) != n:
+        raise ValueError("armed series must align with frame")
     times = rows["timestamp"].tolist() if "timestamp" in rows.columns else list(range(n))
 
     fee, slip = costs.taker_fee, costs.slippage
-    ret, pos_arr = _run_loop(
+    ret, pos_arr, ov_stats = _run_loop(
         a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
         p, fee, slip, cfg.aggregate_minutes,
-        trades_out := [],
+        trades_out := [], overlay, a_armed,
     )
     equity = pd.Series(np.cumprod(1.0 + ret), index=rows.index, name="equity")
     bar_returns = pd.Series(ret, index=rows.index, name="bar_return")
     position = pd.Series(pos_arr, index=rows.index, name="weight")
     metrics = _metrics(trades_out, ret, pos_arr, a_close, cfg.aggregate_minutes)
+    if overlay is not None or armed is not None:
+        metrics.update(ov_stats)
     return BacktestResult(trades_out, equity, position, bar_returns, metrics)
 
 
 def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
-              p, fee, slip, bar_minutes, trades):
-    """The trading loop. Returns (per-bar portfolio returns, per-bar weights).
+              p, fee, slip, bar_minutes, trades, ov_params=None, a_armed=None):
+    """The trading loop. Returns (per-bar returns, per-bar weights, overlay stats).
 
     Accounting convention — every bar's return is written exactly once:
       * entry bar:   w * (close/fill_in - 1) - w*fee
       * holding bar: w * (close/prev_close - 1)
       * exit bar:    w * (fill_out/prev_close - 1) - w*fee
     Slippage is inside the fill prices; fees are charged on both sides.
+
+    With ``ov_params`` None the loop is the pure v2 engine. With an overlay,
+    two extra mechanisms act *around* the same accounting: permission
+    (``ov.can_enter`` — the human/kill-switch gate) and sizing composition
+    (``ov.entry_weight``). Equity for the kill switch is tracked by folding
+    each bar's return into a running product exactly once (``fold``), under
+    the same convention as the returns themselves.
     """
+    from . import overlay as ov
+
     n = len(a_close)
     ret = np.zeros(n)
     pos_arr = np.zeros(n)
@@ -146,7 +172,28 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
     peak = 0.0
     fill_in = 0.0
     reason_in = ""
+    m_tier_in = 1.0
+    m_cool_in = 1.0
     last_counted = -1  # highest bar index whose return has been written
+
+    ov_state = ov.OverlayState(state=ov.ARMED) if ov_params is not None else None
+    ov_active = ov_params is not None or a_armed is not None
+    dates = [str(t)[:10] for t in times] if ov_active else None
+    eq = 1.0          # running mark-to-market equity for the kill switch
+    eq_folded = 0     # bars <= eq_folded are already inside eq
+    blocked = halts = full_stops = 0
+
+    def fold(j):
+        nonlocal eq, eq_folded
+        while eq_folded < j:
+            eq_folded += 1
+            eq *= 1.0 + ret[eq_folded]
+
+    def ov_events(date_i):
+        nonlocal halts, full_stops
+        events = ov.evaluate(ov_state, ov_params, eq, date_i)
+        halts += sum(1 for e, _ in events if e == "auto_halt_day")
+        full_stops += sum(1 for e, _ in events if e == "auto_full_stop")
 
     def close_trade(exit_bar, fill_out, reason, held):
         gross = fill_out / fill_in - 1.0
@@ -156,15 +203,41 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
             entry_price=fill_in, exit_price=fill_out, weight=w,
             reason_out=reason, gross_pct=gross, net_pct=net,
             weighted_net=net * w, bars_held=held, reason_in=reason_in,
+            m_tier=m_tier_in, m_cooldown=m_cool_in,
         ))
+        if ov_params is not None:
+            ov.on_trade_closed(ov_state)
 
     i = 1
     while i < n - 1:
         if w == 0.0:
+            if ov_active:
+                fold(i - 1)
+                if ov_params is not None:
+                    ov_events(dates[i])
             s = a_score[i]
             if np.isfinite(s) and s > p.theta_in:
+                if ov_params is not None:
+                    permitted = ov.can_enter(ov_state, dates[i], bool(a_armed[i]))
+                elif a_armed is not None:
+                    permitted = bool(a_armed[i])
+                else:
+                    permitted = True
+                if not permitted:
+                    blocked += 1
+                    i += 1
+                    continue
                 w_new = position_weight(a_vol[i], bar_minutes, p.target_vol, p.min_weight)
+                if ov_params is not None and w_new > 0.0:
+                    mult = ov.multiplier(ov_state, ov_params)
+                    w_new = ov.entry_weight(
+                        w_new, a_open[i + 1], a_atr[i], p.trail_atr,
+                        0.0, mult, ov_params, p.min_weight)
                 if w_new > 0.0:
+                    if ov_params is not None:
+                        m_tier_in = ov.TIER_MULT if ov_state.half_tier else 1.0
+                        m_cool_in = (ov_params.transition_size_mult
+                                     if ov_state.cooldown_left > 0 else 1.0)
                     w = w_new
                     entry_bar = i + 1
                     fill_in = a_open[entry_bar] * (1.0 + slip)
@@ -187,15 +260,21 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
             last_counted = i
         pos_arr[i] = w
         peak = max(peak, a_close[i])
+        if ov_params is not None:
+            fold(i)
+            ov_events(dates[i])
 
         exit_reason = None
-        s = a_score[i]
-        if np.isfinite(s) and s < p.theta_out:
-            exit_reason = "score_fade"
-        elif a_close[i] < peak - p.trail_atr * a_atr[i]:
-            exit_reason = "trail_stop"
-        elif (i - entry_bar + 1) >= p.max_hold_bars:
-            exit_reason = "time_stop"
+        if ov_params is not None and ov.should_flatten(ov_state):
+            exit_reason = "full_stop"
+        else:
+            s = a_score[i]
+            if np.isfinite(s) and s < p.theta_out:
+                exit_reason = "score_fade"
+            elif a_close[i] < peak - p.trail_atr * a_atr[i]:
+                exit_reason = "trail_stop"
+            elif (i - entry_bar + 1) >= p.max_hold_bars:
+                exit_reason = "time_stop"
 
         if exit_reason is not None:
             exit_bar = i + 1
@@ -216,7 +295,8 @@ def _run_loop(a_open, a_high, a_low, a_close, a_vol, a_atr, a_score, times,
         else:
             ret[exit_bar] += w * (fill_out / a_close[exit_bar - 1] - 1.0) - w * fee
         close_trade(exit_bar, fill_out, "end_of_data", exit_bar - entry_bar + 1)
-    return ret, pos_arr
+    return ret, pos_arr, {"n_blocked_entries": blocked, "n_day_halts": halts,
+                          "n_full_stops": full_stops}
 
 
 def _metrics(trades: list[Trade], ret: np.ndarray, pos_arr: np.ndarray,
