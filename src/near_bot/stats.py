@@ -145,17 +145,20 @@ def expected_max_sharpe(n_trials: int, var_sharpe: float) -> float:
 
 
 def deflated_sharpe(sr: float, n_obs: int, trial_sharpes, skew: float | None = None,
-                    kurt: float | None = None) -> dict:
+                    kurt: float | None = None, n_trials: int | None = None) -> dict:
     """Probabilistic Sharpe ratio against the selection-bias benchmark.
 
     ``sr`` is the observed per-observation (e.g. per-bar) Sharpe of the chosen
-    configuration; ``trial_sharpes`` are the Sharpe estimates of every trial
-    in the same units (their variance is √V in the benchmark). Returns the
-    benchmark SR*, the DSR probability, and the inputs for the report.
+    configuration; ``trial_sharpes`` are the Sharpe estimates of evaluated
+    trials in the same units (their variance is √V in the benchmark).
+    ``n_trials`` overrides the count — pass the trials ledger
+    (``TRIALS_TRIED``), which charges for configurations tried but never
+    written down anywhere else. Returns the benchmark SR*, the DSR
+    probability, and the inputs for the report.
     """
     trial_sharpes = np.asarray(list(trial_sharpes), dtype=float)
     trial_sharpes = trial_sharpes[np.isfinite(trial_sharpes)]
-    n_trials = max(len(trial_sharpes), 2)
+    n_trials = max(n_trials or 0, len(trial_sharpes), 2)
     var_sh = float(trial_sharpes.var(ddof=1)) if len(trial_sharpes) > 1 else 0.0
     sr_star = expected_max_sharpe(n_trials, var_sh)
     if n_obs < 2:

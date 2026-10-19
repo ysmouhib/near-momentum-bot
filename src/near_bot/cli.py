@@ -328,7 +328,6 @@ def cmd_journal(cfg: Config, args):
         for _, e in events.iterrows():
             print(f"{e['ts_utc']}  {e['event']:<15} {e['state_after']:<9} {e['note']}")
         return 0
-    # report
     if events.empty:
         print("Journal is empty — no human calls to score yet.")
         return 0
