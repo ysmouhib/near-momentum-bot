@@ -15,7 +15,10 @@ and for the pooled cross-symbol portfolio:
   (over the stitched per-bar OOS returns), and on expectancy per *decision*
   — the resampling unit for expectancy is the independent decision cluster,
   never the individual trade or the ensemble leg (DESIGN.md §7.2, §7.5),
-* the deflated Sharpe ratio against the trials ledger (stats.TRIALS_TRIED),
+* the deflated Sharpe ratio: N from the trials ledger (stats.TRIALS_TRIED),
+  and the trial-Sharpe variance V from every grid cell traded as a fixed
+  configuration *on the same OOS bars* as the tested series (see
+  ``fixed_config_returns`` for why the sample length has to match),
 * N_eff — independent decisions after clustering overlapping trades — next
   to every trade count,
 * the OOS results conditioned on BTC regime (DESIGN.md §3.4): an altcoin
@@ -38,14 +41,18 @@ label known at the *previous* close, so "BTC was trending up" can never mean
 
 from __future__ import annotations
 
+import copy
 import datetime as dt
 import math
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
+from . import backtest as bt
 from . import indicators, stats
+from . import score as score_mod
 from . import walkforward as wf
 
 NOISE_SENTENCE = ("This result is not statistically distinguishable from noise "
@@ -239,17 +246,53 @@ def _verdict(b: dict) -> tuple[bool, str]:
                    "established, keep measuring")
 
 
-def _trial_charge(results: list[wf.WalkForwardResult]) -> tuple[list[float], int]:
-    """Trial Sharpes (every eligible combo of every window) and the trial count.
+# ScoreParams fields that change indicators.add_all output (cache key).
+_INDICATOR_FIELDS = ("mom_fast", "mom_slow", "vol_window", "bo_window", "ofi_window",
+                     "er_window", "trend_window", "atr_period")
 
-    The count is the ledger or the selections actually made in this run
-    (traded windows × grid cells), whichever is larger — overcounting lowers
-    DSR, which is the intended direction of error.
+
+def _per_bar_sharpe(x) -> float:
+    x = np.asarray(x, dtype=float)
+    sd = x.std()
+    return float(x.mean() / sd) if sd > 0 else 0.0
+
+
+def fixed_config_returns(bars: pd.DataFrame, cfg, oos_index, overlay=None,
+                         grid: dict | None = None) -> dict[tuple, pd.Series]:
+    """Every grid cell traded as one fixed configuration, on the OOS bars only.
+
+    Why the deflated Sharpe needs these, not the in-sample window Sharpes
+    --------------------------------------------------------------------
+    The benchmark SR* = √V · f(N) is the Sharpe the best of N worthless trials
+    would show by luck, and V must be the variance of trial Sharpes estimated
+    on a sample as long as the tested one — a per-bar Sharpe's estimation
+    noise scales as 1/√T. The first real-data run (e0d6f3c) took V from
+    in-sample window Sharpes (720-2,160 bars) and set it against a
+    ~47,000-bar OOS Sharpe: the short windows' noise alone put SR* at +6 to
+    +13 annualised, a bar no strategy could clear. Trading each cell as a
+    fixed configuration over the same OOS bars puts trials and tested series
+    on the same T, which is what Bailey & López de Prado's benchmark assumes.
+    N still comes from the trials ledger (DESIGN.md §7.3).
+
+    Returns ``{combo key: per-bar returns indexed by OOS bar timestamp}``.
     """
-    sharpes = [s for r in results for w in r.windows for s in w.trial_sharpes]
-    made = max((sum(1 for w in r.windows if w.combos is not None) * r.n_combos
-                for r in results), default=0)
-    return sharpes, max(stats.TRIALS_TRIED, made)
+    grid = grid or wf.DEFAULT_GRID
+    idx = np.asarray(list(oos_index), dtype=int)
+    ts = pd.DatetimeIndex(bars["timestamp"].reset_index(drop=True).iloc[idx])
+    frames: dict[tuple, pd.DataFrame] = {}
+    out: dict[tuple, pd.Series] = {}
+    for combo in wf._combos(grid):
+        params = replace(cfg.strategy, **combo)
+        key = tuple(getattr(params, f) for f in _INDICATOR_FIELDS)
+        if key not in frames:
+            frames[key] = indicators.add_all(bars, params)
+        frame = frames[key]
+        sub = copy.copy(cfg)
+        sub.strategy = params
+        res = bt.run(frame, sub, score_mod.compute(frame, params), overlay=overlay)
+        out[tuple(sorted(combo.items()))] = pd.Series(res.bar_returns.to_numpy()[idx],
+                                                      index=ts)
+    return out
 
 
 def run_battery(bars_by_symbol: dict[str, pd.DataFrame], cfg, *, train_bars: int,
@@ -270,6 +313,7 @@ def run_battery(bars_by_symbol: dict[str, pd.DataFrame], cfg, *, train_bars: int
     blocks: dict[str, dict] = {}
     results: dict[str, wf.WalkForwardResult] = {}
     returns: dict[str, pd.Series] = {}
+    fixed: dict[str, dict[tuple, pd.Series]] = {}
     for symbol, bars in bars_by_symbol.items():
         try:
             res = wf.run(bars, cfg, train_bars=train_bars, test_bars=test_bars,
@@ -280,10 +324,14 @@ def run_battery(bars_by_symbol: dict[str, pd.DataFrame], cfg, *, train_bars: int
             continue
         results[symbol] = res
         returns[symbol] = timestamped(res, bars)
-        sharpes, n_trials = _trial_charge([res])
+        if len(res.oos_returns) >= 10:
+            fixed[symbol] = fixed_config_returns(bars, cfg, res.oos_returns.index,
+                                                 overlay=overlay)
         blk = evaluate(res.oos_returns.to_numpy(), res.oos_trades, bar_minutes=bm,
                        top_k=top_k, n_boot=n_boot, block=block, seed=seed,
-                       trial_sharpes=sharpes, n_trials=n_trials)
+                       trial_sharpes=[_per_bar_sharpe(r) for r in
+                                      fixed.get(symbol, {}).values()],
+                       n_trials=stats.TRIALS_TRIED)
         blk["windows"] = len(res.windows)
         blk["windows_traded"] = sum(1 for w in res.windows if w.combos is not None)
         if regime is not None and len(returns[symbol]):
@@ -291,13 +339,15 @@ def run_battery(bars_by_symbol: dict[str, pd.DataFrame], cfg, *, train_bars: int
         blocks[symbol] = blk
 
     pooled = None
-    pool = [s for s in results if s != context_symbol and len(returns[s])]
+    pool = [s for s in results if s != context_symbol and s in fixed]
     if len(pool) >= 2:
         pr = pooled_returns({s: returns[s] for s in pool})
-        sharpes, n_trials = _trial_charge([results[s] for s in pool])
+        # each trial = one grid cell traded fixed on every pooled symbol at once
+        trials = [_per_bar_sharpe(pooled_returns({s: fixed[s][k] for s in pool}))
+                  for k in fixed[pool[0]]]
         pooled = evaluate(pr.to_numpy(), [t for s in pool for t in results[s].oos_trades],
                           bar_minutes=bm, top_k=top_k, n_boot=n_boot, block=block,
-                          seed=seed, trial_sharpes=sharpes, n_trials=n_trials,
+                          seed=seed, trial_sharpes=trials, n_trials=stats.TRIALS_TRIED,
                           pnl_scale=1.0 / (top_k * len(pool)))
         pooled["members"] = pool
         if regime is not None:

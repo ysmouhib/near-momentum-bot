@@ -5,7 +5,7 @@
 - Engine: walk-forward, Sharpe selection over 12 grid cells, top-3 ensemble; risk overlay OFF (pure engine)
 - Costs: taker fee 0.100% + slippage 0.020% per side
 - Bootstrap: 10,000 circular-block resamples, block 168 bars, seed 7, 95% percentile CIs
-- Deflated Sharpe: trials ledger stats.TRIALS_TRIED = 94 (charged as max(ledger, traded windows x grid cells))
+- Deflated Sharpe: N = trials ledger stats.TRIALS_TRIED = 94; trial-Sharpe variance from the 12 grid cells traded as fixed configs on the same OOS bars
 - BTC regime: chop if ER(48) < 0.2, else up/down vs SMA(200); label lagged one bar; descriptive only, never a signal
 
 ## Window variant: train 90d / test 30d
@@ -18,7 +18,7 @@
 - Max drawdown: -41.55%  95% CI [-66.17%, -23.78%]
 - Total return: +35.82%
 - Expectancy / decision: +0.132%  95% CI [-0.204%, +0.484%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -5.73 (SR* +6.09 ann., N trials 792)
+- Deflated Sharpe: P(SR > SR*) = 0.328, excess over benchmark -0.19 (SR* +0.55 ann., N trials 94)
 - Windows: 66/66 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  7,765 bars (16%), return +17.96%, Sharpe +0.70
@@ -35,7 +35,7 @@
 - Max drawdown: -44.67%  95% CI [-68.49%, -24.14%]
 - Total return: +21.68%
 - Expectancy / decision: +0.098%  95% CI [-0.206%, +0.424%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -5.70 (SR* +5.97 ann., N trials 792)
+- Deflated Sharpe: P(SR > SR*) = 0.272, excess over benchmark -0.26 (SR* +0.53 ann., N trials 94)
 - Windows: 66/66 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  7,765 bars (16%), return +60.23%, Sharpe +1.51
@@ -52,7 +52,7 @@
 - Max drawdown: -43.21%  95% CI [-62.49%, -22.43%]
 - Total return: +58.02%
 - Expectancy / decision: +0.181%  95% CI [-0.166%, +0.552%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -5.75 (SR* +6.22 ann., N trials 792)
+- Deflated Sharpe: P(SR > SR*) = 0.379, excess over benchmark -0.13 (SR* +0.60 ann., N trials 94)
 - Windows: 66/66 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  7,765 bars (16%), return -0.24%, Sharpe +0.19
@@ -69,7 +69,7 @@
 - Max drawdown: -33.96%  95% CI [-49.98%, -16.65%]
 - Total return: +47.10%
 - Expectancy / decision: +0.120%  95% CI [-0.085%, +0.340%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -6.21 (SR* +6.70 ann., N trials 2376)
+- Deflated Sharpe: P(SR > SR*) = 0.323, excess over benchmark -0.20 (SR* +0.69 ann., N trials 94)
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  7,765 bars (16%), return +26.50%, Sharpe +1.01
   - chop: 32,904 bars (69%), return +17.42%, Sharpe +0.37
@@ -84,7 +84,7 @@
 - Max drawdown: -48.38%  95% CI [-78.03%, -28.85%]
 - Total return: -27.45%
 - Expectancy / decision: -0.059%  95% CI [-0.380%, +0.290%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -6.90 (SR* +6.71 ann., N trials 792)
+- Deflated Sharpe: P(SR > SR*) = 0.108, excess over benchmark -0.53 (SR* +0.33 ann., N trials 94)
 - Windows: 66/66 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  7,765 bars (16%), return +98.53%, Sharpe +2.08
@@ -103,7 +103,7 @@
 - Max drawdown: -29.28%  95% CI [-59.52%, -21.66%]
 - Total return: +73.35%
 - Expectancy / decision: +0.181%  95% CI [-0.105%, +0.488%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -11.20 (SR* +11.72 ann., N trials 2436)
+- Deflated Sharpe: P(SR > SR*) = 0.390, excess over benchmark -0.12 (SR* +0.65 ann., N trials 94)
 - Windows: 203/206 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  8,171 bars (17%), return +9.90%, Sharpe +0.46
@@ -120,7 +120,7 @@
 - Max drawdown: -33.07%  95% CI [-66.36%, -23.74%]
 - Total return: +47.90%
 - Expectancy / decision: +0.138%  95% CI [-0.128%, +0.433%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -12.04 (SR* +12.46 ann., N trials 2436)
+- Deflated Sharpe: P(SR > SR*) = 0.345, excess over benchmark -0.17 (SR* +0.59 ann., N trials 94)
 - Windows: 203/206 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  8,121 bars (17%), return +82.56%, Sharpe +1.77
@@ -137,14 +137,14 @@
 - Max drawdown: -34.61%  95% CI [-59.58%, -22.26%]
 - Total return: +138.96%
 - Expectancy / decision: +0.274%  95% CI [-0.038%, +0.596%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -11.62 (SR* +12.36 ann., N trials 2448)
+- Deflated Sharpe: P(SR > SR*) = 0.553, excess over benchmark +0.06 (SR* +0.69 ann., N trials 94)
 - Windows: 204/206 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  8,142 bars (17%), return +11.33%, Sharpe +0.49
   - chop: 33,921 bars (69%), return +130.91%, Sharpe +1.10
   - down:  6,897 bars (14%), return -7.05%, Sharpe -0.69
 - OOS equity: ![SOLUSDT](validate_SOLUSDT_30d10d.png)
-- **Verdict: This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))**
+- **Verdict: This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero)**
 
 ### POOLED (equal weight: NEARUSDT + ETHUSDT + SOLUSDT; BTCUSDT excluded)
 
@@ -154,7 +154,7 @@
 - Max drawdown: -25.73%  95% CI [-46.96%, -16.32%]
 - Total return: +93.88%
 - Expectancy / decision: +0.169%  95% CI [-0.024%, +0.368%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -12.35 (SR* +13.09 ann., N trials 6528)
+- Deflated Sharpe: P(SR > SR*) = 0.429, excess over benchmark -0.08 (SR* +0.81 ann., N trials 94)
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  8,294 bars (17%), return +31.77%, Sharpe +1.08
   - chop: 34,182 bars (69%), return +52.61%, Sharpe +0.80
@@ -169,7 +169,7 @@
 - Max drawdown: -32.02%  95% CI [-65.53%, -22.70%]
 - Total return: +34.06%
 - Expectancy / decision: +0.110%  95% CI [-0.171%, +0.399%]
-- Deflated Sharpe: P(SR > SR*) = 0.000, excess over benchmark -12.86 (SR* +13.21 ann., N trials 2436)
+- Deflated Sharpe: P(SR > SR*) = 0.471, excess over benchmark -0.03 (SR* +0.39 ann., N trials 94)
 - Windows: 203/206 traded
 - BTC regime at the previous close (descriptive, not a signal):
   - up  :  8,244 bars (17%), return +140.91%, Sharpe +2.45
@@ -187,7 +187,7 @@
 - train 90d / test 30d | BTCUSDT (context stream, kept out of the pool): This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
 - train 30d / test 10d | NEARUSDT (production): This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
 - train 30d / test 10d | ETHUSDT: This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
-- train 30d / test 10d | SOLUSDT: This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
+- train 30d / test 10d | SOLUSDT: This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero)
 - train 30d / test 10d | POOLED (equal weight: NEARUSDT + ETHUSDT + SOLUSDT; BTCUSDT excluded): This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
 - train 30d / test 10d | BTCUSDT (context stream, kept out of the pool): This result is not statistically distinguishable from noise at this sample size. (Sharpe CI includes zero; annualised-return CI includes zero; per-decision expectancy CI includes zero; deflated Sharpe <= 0 (no excess over the selection-bias benchmark))
 

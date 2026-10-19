@@ -10,12 +10,15 @@ that ends in a verdict and names any symbol it could not find.
 
 from __future__ import annotations
 
+import copy
+from dataclasses import replace
+
 import numpy as np
 import pandas as pd
 import pytest
 from conftest import make_1m_klines
 
-from near_bot import cli, data, stats, validate
+from near_bot import backtest, cli, data, indicators, stats, validate
 from near_bot import walkforward as wf
 from near_bot.backtest import Trade
 from near_bot.config import Config
@@ -189,6 +192,38 @@ def test_run_battery_pools_traded_symbols_and_keeps_btc_apart():
     assert report.index("NEARUSDT (production)") < report.index("POOLED")
     assert report.index("POOLED") < report.index("BTCUSDT (context stream")
     assert "## Verdict" in report and "**Overall:" in report
+
+
+def test_dsr_trials_are_measured_on_the_tested_oos_bars():
+    """The deflated-Sharpe benchmark must compare like with like: every grid
+    cell traded fixed over exactly the OOS bars of the tested series, N from
+    the ledger (the e0d6f3c run used short in-sample window Sharpes and got an
+    SR* of +6..+13 annualised)."""
+    cfg = _cfg()
+    bars = _bars(7)
+    res = wf.run(bars, cfg, train_bars=384, test_bars=96, top_k=3)
+    fixed = validate.fixed_config_returns(bars, cfg, res.oos_returns.index)
+    assert len(fixed) == res.n_combos == 12
+    oos_ts = validate.timestamped(res, bars).index
+    for series in fixed.values():
+        assert series.index.equals(oos_ts)
+    # one fixed config, run directly, gives the same OOS bars
+    key = tuple(sorted(next(iter(wf._combos(wf.DEFAULT_GRID))).items()))
+    params = replace(cfg.strategy, **dict(key))
+    sub = copy.copy(cfg)
+    sub.strategy = params
+    direct = backtest.run(indicators.add_all(bars, params), sub).bar_returns.to_numpy()
+    assert np.array_equal(fixed[key].to_numpy(), direct[list(res.oos_returns.index)])
+
+    battery = validate.run_battery({"NEARUSDT": bars}, cfg, train_bars=384,
+                                   test_bars=96, top_k=3, n_boot=50, block=24)
+    blk = battery["symbols"]["NEARUSDT"]
+    assert blk["dsr_trials"] == stats.TRIALS_TRIED
+    # the benchmark is on the scale of an OOS-length Sharpe, not of 384-bar noise
+    sharpes = [validate._per_bar_sharpe(s) for s in fixed.values()]
+    expected = stats.expected_max_sharpe(stats.TRIALS_TRIED, float(np.var(sharpes, ddof=1)))
+    ann = np.sqrt(365 * 24 * 60 / cfg.aggregate_minutes)
+    assert blk["dsr_benchmark"] == pytest.approx(expected * ann)
 
 
 def test_run_battery_reports_short_history_instead_of_dropping_it():

@@ -205,8 +205,9 @@ def cmd_validate(cfg: Config, args):
          f"{cfg.costs.slippage:.3%} per side"),
         (f"- Bootstrap: {n_boot:,} circular-block resamples, block {block} bars, "
          f"seed 7, 95% percentile CIs"),
-        (f"- Deflated Sharpe: trials ledger stats.TRIALS_TRIED = {stats.TRIALS_TRIED} "
-         f"(charged as max(ledger, traded windows x grid cells))"),
+        (f"- Deflated Sharpe: N = trials ledger stats.TRIALS_TRIED = {stats.TRIALS_TRIED}; "
+         f"trial-Sharpe variance from the {n_cells} grid cells traded as fixed "
+         f"configs on the same OOS bars"),
         (f"- BTC regime: chop if ER({p.er_window}) < {p.er_min}, else up/down vs "
          f"SMA({p.trend_window}); label lagged one bar; descriptive only, never a signal"),
     ]

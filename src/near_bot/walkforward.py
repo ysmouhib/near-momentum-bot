@@ -61,8 +61,9 @@ class WindowResult:
     out_metrics: dict = field(default_factory=dict)
     note: str = ""
     # Per-window OOS ensemble returns (indexed by bar) for the bootstrap, and
-    # the IS Sharpe of *every* eligible combo — each one is a trial, and the
-    # deflated Sharpe's variance term must see the losers, not just the picks.
+    # the IS Sharpe of *every* eligible combo (diagnostic: how decisive each
+    # selection was). Not a deflated-Sharpe input — those IS Sharpes come
+    # from short windows; see validate.fixed_config_returns.
     oos_returns: pd.Series | None = None
     trial_sharpes: list[float] = field(default_factory=list)
 
