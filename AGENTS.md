@@ -94,8 +94,9 @@ src/near_bot/
 └── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, validate,
                     #   arm, disarm, journal {list,report}, status, paper, live
 
-tests/              # 127-test pytest suite (see below)
+tests/              # 137-test pytest suite (see below)
 experiments/        # sweep.py (plateau robustness), regime_sweep.py (value of regime-call accuracy, DESIGN.md §7.4),
+                    #   plateau_hunt.py (pre-registered parameter search + gated holdout shot),
                     #   make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
 docs/               # STRATEGY.md (v2 rationale), DESIGN.md (Trend Rider contract), engine.js, GitHub Pages site
@@ -153,6 +154,12 @@ python experiments/sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 # (labels from realised walk-forward P&L; M seeded synthetic humans per p;
 #  empirical break-even vs the arithmetic, 40% and 56%) -> reports/regime_sweep.md
 python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
+
+# Pre-registered plateau hunt on 2021-2024 (spec fixed in the file; never edit the
+# spec after seeing results — a new spec is a new pre-registration + ledger charge)
+python experiments/plateau_hunt.py                  # -> reports/plateau_hunt.md + .csv
+# the one holdout shot: ONLY with explicit human approval
+python experiments/plateau_hunt.py --holdout --center theta_in=... trail_atr=... er_min=...
 ```
 
 `near-bot live` trades real funds and is guarded by an interactive
@@ -161,7 +168,7 @@ python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 ## Testing
 
 ```bash
-pytest -q                                # 127 tests, all offline (synthetic fixtures)
+pytest -q                                # 137 tests, all offline (synthetic fixtures)
 ruff check src tests                     # lint — must be clean (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py      # regenerate parity fixtures (writes /tmp/*.json)
 node experiments/parity_check.js         # JS engine == Python engine (needs Node.js)

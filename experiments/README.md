@@ -26,6 +26,15 @@ directory.
   python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
   ```
 
+- `plateau_hunt.py` — the **pre-registered** parameter search. Grid (5x5x5 over
+  `theta_in` x `trail_atr` x `er_min`), score, eligibility, plateau rule
+  (best *neighbourhood* score, not best cell), stability veto (2021-22 vs
+  2023-24) and the holdout protocol are fixed in the file and were committed,
+  with the 125 trials charged to `stats.TRIALS_TRIED`, before any cell was
+  scored. Searches 2021-2024 only (a hard guard keeps holdout bars out);
+  the one holdout shot (`--holdout --center ...`) runs only after explicit
+  approval. Writes `reports/plateau_hunt.md` + `.csv` (every cell).
+
 - `make_fixtures.py` / `parity_check.js` — pins the web simulator's JavaScript
   engine (`docs/engine.js`) to the Python engine: identical trades, prices,
   weights and metrics on shared fixture data across several parameter, cost and

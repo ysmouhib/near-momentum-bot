@@ -42,9 +42,12 @@ _EULER = 0.5772156649015329
 #   v2 plateau sweep, one knob at a time (~24 points) .......  24
 #   window-size / timeframe variants tried ..................  ~8
 #   overlay threshold choices considered (DESIGN.md §9) ..... ~10
+#   pre-registered plateau hunt 2026-10, 5x5x5 grid over
+#     theta_in x trail_atr x er_min (experiments/plateau_hunt.py),
+#     charged before any cell was scored .................... 125
 # Bump this whenever a new configuration is evaluated. Overcounting lowers
 # DSR; that is the intended direction of error.
-TRIALS_TRIED = 94
+TRIALS_TRIED = 219
 
 
 # ------------------------------------------------------------------ moments
