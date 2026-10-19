@@ -127,22 +127,39 @@ def _fetch_file(url: str, fname: str, source: str, verify_checksum: bool,
     return df
 
 
+def _published(symbol: str, day: dt.date) -> bool:
+    """Cheap existence probe for one daily dump (its tiny .CHECKSUM sidecar)."""
+    fname = f"{symbol}-1m-{day.isoformat()}.zip"
+    resp = requests.get(BASE.format(symbol=symbol, fname=fname) + ".CHECKSUM", timeout=30)
+    return resp.status_code != 404
+
+
 def fetch_range(symbol: str, start: dt.date, end: dt.date, pause: float = 0.1,
-                verify_checksum: bool = True) -> tuple[pd.DataFrame, dict]:
+                verify_checksum: bool = True,
+                from_listing: bool = False) -> tuple[pd.DataFrame, dict]:
     """Download 1m klines for the fixed window [start, end) (end exclusive).
 
     Monthly zips cover every calendar month fully inside the window; daily
     zips cover the partial leading/trailing month days and stand in for any
     monthly zip that 404s. Returns the concatenated DataFrame plus a
     manifest dict (``symbol``, ``start``, ``end``, ``files`` with
-    name/source/rows/sha256 per file, ``missing_days``, ``missing_months``)
-    that makes the dataset auditable and re-downloadable.
+    name/source/rows/sha256 per file, ``missing_days``, ``missing_months``,
+    ``pre_listing``) that makes the dataset auditable and re-downloadable.
+
+    ``from_listing`` handles a symbol listed *after* ``start``: files absent
+    before the first published one are recorded under ``pre_listing`` (and
+    ``listing_start`` = the first bar) instead of as missing data — a
+    listing date is not a hole. A missing monthly zip before any data is
+    probed once on its last day: nothing there means the whole month predates
+    the listing; something there means the listing fell inside the month, so
+    its daily zips are fetched as usual. After the first published file,
+    every 404 is a real gap again and is reported as such.
     """
     if end <= start:
         raise ValueError(f"Empty window: start={start} end={end}")
     manifest: dict = {"symbol": symbol, "start": start.isoformat(),
                       "end": end.isoformat(), "files": [],
-                      "missing_days": [], "missing_months": []}
+                      "missing_days": [], "missing_months": [], "pre_listing": []}
     frames: list[pd.DataFrame] = []
     plan = _window_plan(start, end)
     i = 0
@@ -153,6 +170,11 @@ def fetch_range(symbol: str, start: dt.date, end: dt.date, pause: float = 0.1,
             url = MONTHLY_BASE.format(symbol=symbol, fname=fname)
             df = _fetch_file(url, fname, "monthly", verify_checksum, manifest)
             if df is None:
+                last_day = min(_first_of_next_month(when), end) - dt.timedelta(days=1)
+                if from_listing and not frames and not _published(symbol, last_day):
+                    manifest["pre_listing"].append(f"{when:%Y-%m}")
+                    i += 1
+                    continue
                 manifest["missing_months"].append(f"{when:%Y-%m}")
                 # Splice this month's daily zips into the plan, in place.
                 days = []
@@ -170,7 +192,8 @@ def fetch_range(symbol: str, start: dt.date, end: dt.date, pause: float = 0.1,
             url = BASE.format(symbol=symbol, fname=fname)
             df = _fetch_file(url, fname, "daily", verify_checksum, manifest)
             if df is None:
-                manifest["missing_days"].append(when.isoformat())
+                key = "pre_listing" if from_listing and not frames else "missing_days"
+                manifest[key].append(when.isoformat())
             else:
                 frames.append(df)
                 time.sleep(pause)
@@ -178,5 +201,7 @@ def fetch_range(symbol: str, start: dt.date, end: dt.date, pause: float = 0.1,
     if not frames:
         raise RuntimeError(f"No dump data returned for {symbol}")
     df = pd.concat(frames, ignore_index=True)
-    df = df.drop_duplicates("open_time").sort_values("open_time")
-    return df.reset_index(drop=True), manifest
+    df = df.drop_duplicates("open_time").sort_values("open_time").reset_index(drop=True)
+    if manifest["pre_listing"]:
+        manifest["listing_start"] = df["open_time"].iloc[0].isoformat()
+    return df, manifest

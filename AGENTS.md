@@ -87,12 +87,14 @@ src/near_bot/
 ├── validate.py     # the validation battery behind `near-bot validate` (CIs, DSR, N_eff, BTC regime, verdict)
 ├── report.py       # matplotlib equity/drawdown/exposure/trade plots (optional dep)
 ├── dump_client.py  # data.binance.vision public daily+monthly zips (no key, no geo-block); fetch_range + manifest
+├── download.py     # the one download pipeline behind both entry points: CSV + manifest, gap checks
+│                   #   (allow-list), republished-file detection, --from-listing
 ├── broker.py       # python-binance spot wrapper: paginated klines, LOT_SIZE/min-notional, long-only market orders, equity_usdt()
 ├── executor.py     # paper/live loop reusing the backtester's score + sizing + exit rules; overlay, restart reconciliation
 └── cli.py          # argparse subcommands: test-connection, download, backtest, walkforward, validate,
                     #   arm, disarm, journal {list,report}, status, paper, live
 
-tests/              # 123-test pytest suite (see below)
+tests/              # 127-test pytest suite (see below)
 experiments/        # sweep.py (plateau robustness), regime_sweep.py (value of regime-call accuracy, DESIGN.md §7.4),
                     #   make_fixtures.py + parity_check.js (JS/Python parity); not imported by src/
 scripts/            # download_data.py, simulate_90d.py — runnable entry points that sys.path-insert src/
@@ -108,8 +110,11 @@ reports/            # generated plots and validate.md (gitignored)
 
 ```bash
 # Data: a fixed window of 1m klines from public dumps (no API key; --source api uses REST)
-# writes data/NEARUSDT_1m_20230101_20260101.csv + a .manifest.json sidecar;
-# gaps > 5 min are listed, a gap > 1 day fails unless --allow-gaps
+# writes data/NEARUSDT_1m_20230101_20260101.csv + a .manifest.json sidecar (sha256 per
+# file, gaps, first/last bar); gaps > 5 min are listed, a gap > 1 day fails unless
+# allow-listed in the manifest's allowed_gaps (with a reason) or --allow-gaps; a re-run
+# that finds a republished file (sha256 changed) fails loudly; --from-listing starts a
+# symbol listed after --start at its first bar instead of failing (recorded)
 python scripts/download_data.py --symbols NEARUSDT ETHUSDT SOLUSDT BTCUSDT --start 2023-01-01 --end 2026-01-01
 near-bot download --symbols NEARUSDT --start 2023-01-01 --end 2026-01-01   # same, via the CLI
 
@@ -156,7 +161,7 @@ python experiments/regime_sweep.py --csv data/NEARUSDT_1m_20230101_20260101.csv
 ## Testing
 
 ```bash
-pytest -q                                # 123 tests, all offline (synthetic fixtures)
+pytest -q                                # 127 tests, all offline (synthetic fixtures)
 ruff check src tests                     # lint — must be clean (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py      # regenerate parity fixtures (writes /tmp/*.json)
 node experiments/parity_check.js         # JS engine == Python engine (needs Node.js)

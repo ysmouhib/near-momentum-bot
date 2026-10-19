@@ -214,7 +214,7 @@ Every trading decision flows through the same `score.compute()` +
 ## Development
 
 ```bash
-pytest -q                              # 123-test suite, offline
+pytest -q                              # 127-test suite, offline
 ruff check src tests                   # lint (ruff pinned to 0.17.1)
 python experiments/make_fixtures.py    # regenerate parity fixtures
 node experiments/parity_check.js       # JS engine == Python engine

@@ -11,6 +11,7 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import io
+import json
 import zipfile
 from types import SimpleNamespace
 
@@ -191,6 +192,92 @@ def test_fetch_range_unverified_when_checksum_sidecar_missing(monkeypatch):
     df, manifest = dump_client.fetch_range(SYMBOL, START, END, pause=0)
     assert len(df) == N_DAYS * 1440
     assert all(f["sha256_verified"] is False for f in manifest["files"])
+
+
+def _listed_mid_window_server() -> dict[str, bytes]:
+    """A symbol listed 2023-03-10: no Jan dailies, no Feb or Mar monthly zip,
+    March dailies from the 10th, April dailies."""
+    files: dict[str, bytes] = {}
+    day = dt.date(2023, 3, 10)
+    while day < END:
+        name = f"{SYMBOL}-1m-{day.isoformat()}.zip"
+        files[name] = _zip_bytes(_day_frame(day), name)
+        day += dt.timedelta(days=1)
+    return files
+
+
+def test_fetch_range_from_listing_skips_pre_listing_files(monkeypatch):
+    _patch_requests(monkeypatch, _fake_get(_listed_mid_window_server()))
+    df, manifest = dump_client.fetch_range(SYMBOL, START, END, pause=0, from_listing=True)
+    jan = [(START + dt.timedelta(days=k)).isoformat() for k in range(17)]
+    mar = [dt.date(2023, 3, d).isoformat() for d in range(1, 10)]
+    # January days, the whole of February (probed once, not 28 dailies), March 1-9
+    assert manifest["pre_listing"] == jan + ["2023-02"] + mar
+    assert manifest["missing_days"] == []
+    assert manifest["missing_months"] == ["2023-03"]  # the listing month had no monthly zip
+    assert manifest["listing_start"] == "2023-03-10T00:00:00"
+    assert len(df) == (22 + 9) * 1440
+    # without the flag the same server is a dataset with holes, reported as such
+    _, strict = dump_client.fetch_range(SYMBOL, START, END, pause=0)
+    assert len(strict["missing_days"]) == 17 + 28 + 9
+    assert strict["pre_listing"] == [] and "listing_start" not in strict
+
+
+def test_download_run_writes_manifest_and_respects_listing(monkeypatch, tmp_path, capsys):
+    from near_bot import download
+
+    _patch_requests(monkeypatch, _fake_get(_listed_mid_window_server()))
+    rc = download.run([SYMBOL], START, END, tmp_path, from_listing=True, pause=0)
+    assert rc == 0
+    mpath = tmp_path / f"{SYMBOL}_1m_20230115_20230410.manifest.json"
+    manifest = json.loads(mpath.read_text())
+    assert manifest["listing_start"] == "2023-03-10T00:00:00"
+    assert manifest["gaps"] == [] and manifest["republished"] == []
+    assert manifest["rows"] == (22 + 9) * 1440
+    assert manifest["first_bar"] == "2023-03-10 00:00:00"
+    assert "listed after the window start" in capsys.readouterr().out
+    # strict mode: the 54-day pre-listing stretch is a gap over 1 day -> fail loud
+    rc = download.run([SYMBOL], START, END, tmp_path / "strict", pause=0)
+    assert rc == 1
+    assert "exceed 1 day" in capsys.readouterr().err
+
+
+def test_download_rerun_reports_republished_file(monkeypatch, tmp_path, capsys):
+    from near_bot import download
+
+    files = _build_server()
+    _patch_requests(monkeypatch, _fake_get(files))
+    assert download.run([SYMBOL], START, END, tmp_path, pause=0) == 0
+    # Binance republishes one daily file with corrected prices (and a new checksum)
+    name = f"{SYMBOL}-1m-2023-01-16.zip"
+    fixed = _day_frame(dt.date(2023, 1, 16))
+    fixed["close"] = 1.06
+    files[name] = _zip_bytes(fixed, name)
+    assert download.run([SYMBOL], START, END, tmp_path, pause=0) == 1
+    manifest = json.loads((tmp_path / f"{SYMBOL}_1m_20230115_20230410.manifest.json").read_text())
+    assert manifest["republished"] == [name]
+    assert "REPUBLISHED" in capsys.readouterr().err
+
+
+def test_download_gap_fails_until_allow_listed(monkeypatch, tmp_path):
+    from near_bot import download
+
+    files = _build_server()
+    drop = {f"{SYMBOL}-1m-2023-01-20.zip", f"{SYMBOL}-1m-2023-01-21.zip"}
+    _patch_requests(monkeypatch, _fake_get(files, drop=drop))
+    assert download.run([SYMBOL], START, END, tmp_path, pause=0) == 1
+    mpath = tmp_path / f"{SYMBOL}_1m_20230115_20230410.manifest.json"
+    manifest = json.loads(mpath.read_text())
+    assert manifest["gaps"] == [{"start": "2023-01-20 00:00:00", "end": "2023-01-21 23:59:00",
+                                 "missing_bars": 2880, "allowed": False}]
+    # a human allow-lists the known outage, with a reason, in the manifest
+    manifest["allowed_gaps"] = [{"start": "2023-01-20", "end": "2023-01-22",
+                                 "reason": "exchange maintenance (test)"}]
+    mpath.write_text(json.dumps(manifest))
+    assert download.run([SYMBOL], START, END, tmp_path, pause=0) == 0
+    manifest = json.loads(mpath.read_text())
+    assert manifest["gaps"][0]["allowed"] is True
+    assert manifest["allowed_gaps"][0]["reason"] == "exchange maintenance (test)"
 
 
 def test_fetch_range_rejects_empty_window():
