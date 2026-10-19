@@ -188,8 +188,8 @@ def accuracy_report(scored: pd.DataFrame, events: pd.DataFrame,
 
 def format_report(scored: pd.DataFrame, rep: dict) -> str:
     """Render the journal report as plain text for the CLI."""
-    lines = [f"Journal: {rep['n_calls']} human calls, {rep['n_scored']} scored "
-             f"(rest open or beyond available data)"]
+    lines = [(f"Journal: {rep['n_calls']} human calls, {rep['n_scored']} scored "
+              f"(rest open or beyond available data)")]
     for t, d in rep.get("by_type", {}).items():
         lo, hi = d["ci"]
         lines.append(f"  {t:<7} n={d['n']:<3} accuracy {d['accuracy']:.0%} "

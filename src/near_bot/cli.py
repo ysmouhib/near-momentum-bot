@@ -205,6 +205,11 @@ def cmd_paper(cfg: Config, args):
     from .executor import Executor
 
     cfg.paper_trading = True
+    if not cfg.overlay.enabled:
+        logging.getLogger(__name__).warning(
+            "overlay.enabled=false in config — paper/live force it on "
+            "(the production posture is what paper trading must rehearse)")
+        cfg.overlay.enabled = True
     broker = Broker(cfg).connect()
     Executor(cfg, broker).run(poll_seconds=args.poll)
     return 0
@@ -231,7 +236,7 @@ def _market_snapshot(cfg: Config) -> tuple[float | str, float | str]:
 
         broker = Broker(cfg).connect()
         return round(broker.equity_usdt(), 2), broker.price()
-    except Exception as exc:  # a snapshot must never block a decision
+    except Exception as exc:  # noqa: BLE001 - a snapshot must never block a decision
         logging.getLogger(__name__).warning("market snapshot failed: %s", exc)
         return "", ""
 
@@ -285,7 +290,7 @@ def _regime_context(symbol: str) -> str:
         er = indicators.efficiency_ratio(close, 48).iloc[-1]
         side = "above" if close.iloc[-1] > ma else "below"
         return f"{symbol}: close {side} 200h MA | ER(48h)={er:.2f}"
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001 - decision support is best-effort
         return f"{symbol}: context unavailable ({exc})"
 
 
@@ -346,6 +351,7 @@ def cmd_live(cfg: Config, args):
     from .executor import Executor
 
     cfg.paper_trading = False
+    cfg.overlay.enabled = True  # live always runs with the risk overlay
     confirm = input("Type 'I ACCEPT THE RISK' to trade real funds: ")
     if confirm.strip() != "I ACCEPT THE RISK":
         print("Aborted.")

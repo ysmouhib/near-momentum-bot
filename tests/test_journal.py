@@ -7,14 +7,12 @@ and the scoring pipeline (replayed engine P&L over forward windows).
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 import pytest
+from conftest import make_1m_klines
 
 from near_bot import cli, data, indicators, journal
 from near_bot.config import Config
-
-from conftest import make_1m_klines
 
 
 @pytest.fixture
