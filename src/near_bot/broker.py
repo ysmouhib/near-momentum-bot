@@ -77,6 +77,18 @@ class Broker:
                 return float(b["free"]), float(b["locked"])
         return 0.0, 0.0
 
+    def equity_usdt(self) -> float:
+        """Total account equity in USDT, marked to market (free + locked).
+
+        The overlay's high-water mark and daily-loss anchors are defined on
+        this number — anything less complete would let a losing open position
+        hide from the kill switch.
+        """
+        free_usdt, locked_usdt = self.balance("USDT")
+        base = self.symbol.replace("USDT", "")
+        free_base, locked_base = self.balance(base)
+        return free_usdt + locked_usdt + (free_base + locked_base) * self.price()
+
     def get_klines(self, interval: str, limit: int = 200) -> list:
         return self.client.get_klines(symbol=self.symbol, interval=interval, limit=limit)
 
