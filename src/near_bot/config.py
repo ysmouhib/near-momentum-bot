@@ -105,6 +105,50 @@ class DataParams:
 
 
 @dataclass
+class OverlayParams:
+    """The risk overlay: human permission + mechanical brakes (DESIGN.md §4).
+
+    These thresholds are *risk policy chosen a priori*, not fitted parameters
+    — they are never walk-forward optimised, and every value tried still goes
+    into the deflated-Sharpe trials ledger (stats.TRIALS_TRIED). The defaults
+    encode the kill-switch ladder: −2% on the UTC day halts new entries, −5%
+    from the equity high-water mark halves size (cleared at −3% so the tier
+    cannot flap), −10% flattens and demands a human re-arm.
+    """
+
+    enabled: bool = True          # paper/live force this on; backtests default off
+    per_trade_risk_frac: float = 0.006   # R per trade, as a fraction of equity
+    max_exposure_frac: float = 0.40      # quarter-Kelly cap on invested notional
+    hard_max_weight: float = 1.00        # structural (spot, no leverage)
+    daily_loss_halt_frac: float = -0.02  # vs UTC day-start equity
+    hwm_half_size_frac: float = -0.05    # drawdown from HWM → half size
+    hwm_half_clear_frac: float = -0.03   # recovery hysteresis clearing that tier
+    hwm_full_stop_frac: float = -0.10    # flatten + require human re-arm
+    transition_size_mult: float = 0.5    # size multiplier right after a human arm
+    cooldown_trades_after_arm: int = 3   # …for this many entries
+    min_multiplier: float = 0.25         # floor for combined multipliers
+    journal_path: str = "state/journal.csv"
+    state_path: str = "state/overlay_state.json"
+
+
+@dataclass
+class ValidationParams:
+    """The validation battery (DESIGN.md §7): bootstrap, deflated Sharpe,
+    synthetic-regime sweep. Seeds and block lengths live here so reported
+    confidence intervals are reproducible too."""
+
+    train_days: int = 90
+    test_days: int = 30
+    top_k: int = 3
+    bootstrap_reps: int = 10000
+    bootstrap_block_bars: int = 168      # ≈ 1 week of 60m bars
+    journal_horizon_days: int = 5
+    synthetic_accuracies: list[float] = field(
+        default_factory=lambda: [0.5, 0.6, 0.7, 0.8])
+    synthetic_schedules: int = 200
+
+
+@dataclass
 class Config:
     symbol: str = "NEARUSDT"
     base_interval: str = "1m"       # Binance klines are fetched as 1m…
@@ -117,6 +161,8 @@ class Config:
     risk: RiskParams = field(default_factory=RiskParams)
     costs: CostParams = field(default_factory=CostParams)
     data: DataParams = field(default_factory=DataParams)
+    overlay: OverlayParams = field(default_factory=OverlayParams)
+    validation: ValidationParams = field(default_factory=ValidationParams)
 
     # Secrets — populated from the environment, never from YAML.
     api_key: str = field(default="", repr=False)
@@ -136,8 +182,11 @@ class Config:
         risk = RiskParams(**raw.pop("risk", {}) or {})
         costs = CostParams(**raw.pop("costs", {}) or {})
         data_params = DataParams(**raw.pop("data", {}) or {})
+        overlay = OverlayParams(**raw.pop("overlay", {}) or {})
+        validation = ValidationParams(**raw.pop("validation", {}) or {})
 
-        cfg = cls(strategy=strategy, risk=risk, costs=costs, data=data_params, **raw)
+        cfg = cls(strategy=strategy, risk=risk, costs=costs, data=data_params,
+                  overlay=overlay, validation=validation, **raw)
         cfg.api_key = os.getenv("BINANCE_API_KEY", "")
         cfg.api_secret = os.getenv("BINANCE_API_SECRET", "")
         return cfg

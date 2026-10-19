@@ -46,6 +46,34 @@ risk:
   max_notional_frac: 0.95  # live: never deploy more than this of free USDT
   cooldown_bars: 0
 
+# Risk overlay (docs/DESIGN.md §4): human permission switch + kill-switch
+# ladder. These are a-priori risk policy, never optimised.
+overlay:
+  enabled: true              # paper/live force on; backtest/walkforward need --overlay
+  per_trade_risk_frac: 0.006   # R per trade (0.6% of equity), keep in [0.005, 0.0075]
+  max_exposure_frac: 0.40      # quarter-Kelly cap on invested notional
+  hard_max_weight: 1.00        # structural: spot, no leverage
+  daily_loss_halt_frac: -0.02  # vs UTC day-start equity -> no new entries today
+  hwm_half_size_frac: -0.05    # drawdown from equity HWM -> half size
+  hwm_half_clear_frac: -0.03   # ...cleared when drawdown recovers above this
+  hwm_full_stop_frac: -0.10    # flatten everything, require human re-arm
+  transition_size_mult: 0.5    # half size for the first trades after each arm
+  cooldown_trades_after_arm: 3
+  min_multiplier: 0.25
+  journal_path: state/journal.csv
+  state_path: state/overlay_state.json
+
+# Validation battery (docs/DESIGN.md §7)
+validation:
+  train_days: 90
+  test_days: 30
+  top_k: 3
+  bootstrap_reps: 10000
+  bootstrap_block_bars: 168    # ~1 week of 60m bars
+  journal_horizon_days: 5
+  synthetic_accuracies: [0.5, 0.6, 0.7, 0.8]
+  synthetic_schedules: 200
+
 costs:
   taker_fee: 0.001       # 0.10% Binance spot taker (set 0.00075 if paying in BNB)
   slippage: 0.0002       # 0.02% assumed per side on market orders
