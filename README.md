@@ -63,8 +63,9 @@ The engine stays untouched; two layers sit above it (contract:
   dated window per symbol and reports block-bootstrap CIs, a deflated Sharpe that
   charges for every configuration tried, the number of *independent* decisions, and
   a verdict that says "not distinguishable from noise" whenever that is the truth.
-  The multi-year run (NEAR/ETH/SOL/BTC, 2021-01 → 2026-09) is done and makes no
-  performance claim: every block is *not distinguishable from noise*
+  The multi-year run (NEAR/ETH/SOL/BTC/BCH/DOGE/ADA/LINK, 2021-01 → 2026-09, 18
+  symbol × window blocks) is done and makes no performance claim: every block is
+  *not distinguishable from noise*
   ([`reports/validate.md`](reports/validate.md)), and a pre-registered parameter search
   converged toward market exposure without beating buy-and-hold
   ([`reports/plateau_hunt.md`](reports/plateau_hunt.md)).
@@ -113,8 +114,8 @@ I put a standard error on the headline before anyone else has to:
 **Conclusion I actually stand behind:** the v1 scalper is *decisively* dead (−82%, a
 robust finding). The multi-year data, bootstrapped confidence intervals and deflated
 Sharpe this 91-day sample lacked now exist, and they did not change the answer: on
-NEAR/ETH/SOL/BTC from 2021-01 to 2026-09 every validation block is *not distinguishable
-from noise* ([`reports/validate.md`](reports/validate.md)), and a pre-registered
+NEAR/ETH/SOL/BTC/BCH/DOGE/ADA/LINK from 2021-01 to 2026-09 every validation block is *not
+distinguishable from noise* ([`reports/validate.md`](reports/validate.md)), and a pre-registered
 parameter search converged toward market exposure and trails buy-and-hold
 ([`reports/plateau_hunt.md`](reports/plateau_hunt.md)) — so the holdout was left
 unfired. The deliverable here is the machinery and the discipline to reach that

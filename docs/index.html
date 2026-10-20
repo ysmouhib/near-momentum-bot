@@ -4,18 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>near-momentum-bot v2 — honest validation of a trend engine</title>
-<meta name="description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols.">
+<meta name="description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across eight symbols.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="near-momentum-bot v2">
 <meta property="og:title" content="near-momentum-bot v2 — honest validation of a trend engine">
-<meta property="og:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols. Try the browser simulator.">
+<meta property="og:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across eight symbols. Try the browser simulator.">
 <meta property="og:url" content="https://ysmouhib.github.io/near-momentum-bot/">
 <meta property="og:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="near-momentum-bot v2 — honest validation of a trend engine">
-<meta name="twitter:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across four symbols.">
+<meta name="twitter:description" content="A cost-aware backtesting and walk-forward validation framework for Binance spot — built to demonstrate honest evaluation, including the part where the honest answer is 'not distinguishable from noise' — on six years of data across eight symbols.">
 <meta name="twitter:image" content="https://ysmouhib.github.io/near-momentum-bot/img/social.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -113,7 +113,7 @@
     distinguishable from noise." Its one robust finding: on 91 days of real data, the v1
     4-minute scalper <b>lost 82% out-of-sample</b> — the edge never survived 0.24% round-trip
     costs. v2 is the disciplined response: a slower, volatility-targeted trend engine, evaluated
-    with the statistical caution the small sample demands. <b>On six years of data across four
+    with the statistical caution the small sample demands. <b>On six years of data across eight
     symbols, the honest answer stayed the same</b> — <a href="#multi-year">the multi-year
     verdict</a>.</p>
     <div class="actions">
@@ -136,7 +136,7 @@
     <p class="prose"><b>Read this as a worked example of honest evaluation, not as evidence that
     this strategy makes money.</b> The 91-day sample below is now the trailer, not the movie: far
     too small to conclude anything on its own, it stays here to show <em>how to see that</em>,
-    rather than hide it. The movie — six years, four symbols — follows the caveats.</p>
+    rather than hide it. The movie — six years, eight symbols — follows the caveats.</p>
     <p class="prose" style="margin-top:10px">Setup: 91 days of real NEARUSDT 1-minute data
     (mid-April → mid-July 2026), aggregated to 60-minute bars, with Binance taker fees
     (0.10%/side) and slippage (0.02%/side) charged on every fill. Walk-forward re-optimises a
@@ -178,23 +178,32 @@
     <h3 id="multi-year" style="margin-top:34px">Six years later: the multi-year verdict</h3>
     <p class="prose">The caveats above named what a real claim would need: multi-year data,
     bootstrapped confidence intervals and a deflated Sharpe ratio. That run is done — NEAR, ETH,
-    SOL and BTC 1-minute klines from <b>2021-01-01 to 2026-09-30</b> (SHA-256-verified Binance
-    dumps), walk-forward on two window sizes, 10,000-resample block-bootstrap confidence
-    intervals, independent decisions counted, and a deflated Sharpe charged against the trials
-    ledger. <b>All ten symbol × window blocks: not statistically distinguishable from
-    noise.</b></p>
+    SOL, BTC, BCH, DOGE, ADA and LINK 1-minute klines from <b>2021-01-01 to 2026-09-30</b>
+    (SHA-256-verified Binance dumps), walk-forward on two window sizes, 10,000-resample
+    block-bootstrap confidence intervals, independent decisions counted, and a deflated Sharpe
+    charged against the trials ledger. <b>All eighteen symbol × window blocks: not statistically
+    distinguishable from noise.</b></p>
     <table class="res">
       <thead><tr><th>Walk-forward OOS, 2021–2026</th><th>Sharpe, 90d/30d windows [95% CI]</th><th>Sharpe, 30d/10d windows [95% CI]</th><th>Verdict</th></tr></thead>
       <tbody>
         <tr><td>NEARUSDT (production)</td><td>+0.35 [−0.50, +1.17]</td><td>+0.53 [−0.27, +1.28]</td><td>noise</td></tr>
+        <tr><td>ADAUSDT</td><td>+0.28 [−0.61, +1.11]</td><td>+0.61 [−0.22, +1.43]</td><td>noise</td></tr>
+        <tr><td>BCHUSDT</td><td class="neg">−0.22 [−1.17, +0.63]</td><td class="neg">−0.21 [−1.10, +0.60]</td><td>noise · a loss (−34% / −35%)</td></tr>
+        <tr><td>DOGEUSDT</td><td>+0.68 [−0.28, +1.54]</td><td>+0.89 [−0.02, +1.71]</td><td>noise · closest call (30d/10d)†</td></tr>
         <tr><td>ETHUSDT</td><td>+0.27 [−0.62, +1.13]</td><td>+0.42 [−0.47, +1.29]</td><td>noise</td></tr>
+        <tr><td>LINKUSDT</td><td>+0.47 [−0.35, +1.24]</td><td>+0.24 [−0.57, +1.02]</td><td>noise</td></tr>
         <tr><td>SOLUSDT</td><td>+0.47 [−0.37, +1.26]</td><td>+0.75 [−0.12, +1.58]</td><td>noise</td></tr>
-        <tr><td>Pooled NEAR + ETH + SOL</td><td>+0.49 [−0.35, +1.30]</td><td>+0.74 [−0.11, +1.56]</td><td>noise</td></tr>
+        <tr><td>Pooled (7 symbols)</td><td>+0.52 [−0.36, +1.36]</td><td>+0.70 [−0.16, +1.53]</td><td>noise</td></tr>
         <tr><td>BTCUSDT (context stream)</td><td class="neg">−0.20 [−1.20, +0.75]</td><td>+0.36 [−0.56, +1.24]</td><td>noise</td></tr>
       </tbody>
     </table>
-    <p class="caption">Every confidence interval includes zero. Independent decisions per block:
-    320–459; engine max drawdowns −26% to −48%. Full report:
+    <p class="caption">Every Sharpe and annualised-return confidence interval includes zero.
+    Independent decisions per block: 288–464; engine max drawdowns −22% to −61% (the pooled
+    blocks −22% / −25%; per symbol −29% to −61%, BCH worst). BCH lost money on both window
+    sizes: total return −34% / −35%, max drawdown −60% / −61%. † DOGE 30d/10d is the closest
+    call: a deflated-Sharpe probability of 0.949 against the 0.95 gate, and the one per-decision
+    expectancy CI that excludes zero — but its Sharpe CI [−0.02, +1.71] still includes zero.
+    Full report:
     <a href="https://github.com/ysmouhib/near-momentum-bot/blob/main/reports/validate.md">reports/validate.md</a>.</p>
     <p class="prose" style="margin-top:16px">The obvious next question — could better parameters
     rescue it? — got a <b>pre-registered</b> answer: 125 configurations on 2021–2024
@@ -226,7 +235,7 @@
     <div class="callout">
       <span class="lbl">The conclusion actually defended</span>
       <p>The v1 scalper is <b>decisively dead</b> (−82% out-of-sample, a robust finding). v2 is
-      <b>not distinguishable from noise</b> — first on 91 days, then on six years across four
+      <b>not distinguishable from noise</b> — first on 91 days, then on six years across eight
       symbols, with the bootstrapped confidence intervals and deflated Sharpe the 91-day sample
       lacked. A pre-registered search for better parameters converged toward market exposure and
       trails buy-and-hold.</p>

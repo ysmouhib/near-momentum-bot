@@ -134,4 +134,8 @@ Exposure = share of bars with an open position; correlation = between the per-ba
 
 **Decision (2026-10-19): step (c) is not run; the holdout stays sealed.** The holdout [2025-01-01, 2026-10-01) has not been used by any selection and is reserved for a future strategy family. Its status label stands — "viewed in aggregate in e0d6f3c" (the default engine's walk-forward results over those months were reported there) — so a future family should treat it as a viewed, not pristine, holdout.
 
+> **Follow-up (2026-10-20), post-hoc:** the default-engine battery was extended to BCH/DOGE/ADA/LINK — symbols chosen blind, after the hunt, with no parameter changes.
+> 18/18 blocks not distinguishable from noise ([reports/validate.md](validate.md)); DOGE 30d/10d came closest (P(SR > SR*) = 0.949 < 0.95).
+> Consistent with this Finding.
+
 Not financial advice.
