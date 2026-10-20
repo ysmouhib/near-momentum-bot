@@ -1,0 +1,542 @@
+{
+  "symbol": "ADAUSDT",
+  "start": "2021-01-01",
+  "end": "2026-10-01",
+  "files": [
+    {
+      "name": "ADAUSDT-1m-2021-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "88631d7bccf800f92e93f7658fe705869bca89df210c2f3191f16183071c9317",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-02.zip",
+      "source": "monthly",
+      "rows": 40241,
+      "sha256": "a5499d69dbc1eedae6c558f09ce8d7ce77abb14eeca08b869d8b9b45740af0da",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-03.zip",
+      "source": "monthly",
+      "rows": 44550,
+      "sha256": "1f060083b4b47bbdebd57b21e95ec6eb0f573caa93061da074c79033b344e317",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-04.zip",
+      "source": "monthly",
+      "rows": 42766,
+      "sha256": "c3288bf97b90ecdc8615f38160d0910f01966cf90e9e9e6ec981482d5e45fb17",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "578df2c0bba90c3d9e85ef31674e65cb534367cd55d06cd52a5554874c1a2203",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "04fbc897bf6a0bedc40f7358fb5206abca2fcd22689001c50bc7e2a6d770b2d5",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "6236516940c95540d7548edea45b3ef702b857dfd8342d6a1315249bcf1ad727",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-08.zip",
+      "source": "monthly",
+      "rows": 44370,
+      "sha256": "882de361e92a92f4c7049c7409e7c2f66bbeef06601561e4bc532b71627179b8",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-09.zip",
+      "source": "monthly",
+      "rows": 43080,
+      "sha256": "16d221317990c6e21a8e057537d2720504f6add4fb82276dc4986acbfd90c1e7",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "486637abeac44880f558ac9939ebb2008d54e629c739f934cc4d857dce06dcb9",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "605e9a34d0f9dadd7e59f65edff92507150d35e5dc7c13d7d94303ad8bde56d0",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2021-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5b9c1f87b2c6b7ad04bead18a15d5a29ad9c1fb632cdd62e8a2bc2f3b1a13b73",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "51b9fb0b2d31797ac370b0606005b083647ccc5543b6ad23f58ae76ecaddcb88",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "8d3b2654762a6067c2268196629f7b51f76fd493e465692c0455babd6f37d899",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7fcdca6d8f7616daa731680475e3e87aa372ca39f8e5d2ea12cefa4bc87e88af",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "dac0218a9a54931402c3ec1cc5a0f7c2ab3a473293de3cfa5a3fbc5dff5c6702",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "1c1f4dcdefd817bb8804bb2c8a59a0643d5d2a4d8c4d5e8ebc07ac8820b5c208",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "bcb50e9cbd71f5b539d6619082cdde3bdee58e1d31e1777a5d381f8572fdf75a",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d9505df58a06740d8119b1d4a069658ae304464e072275a99d01bb9c87b88f12",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "1278678392fb754c274e7e37dabdca68c401442b4d8bfda32f567e41aae65408",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "06ce6736ed9c20bde6dfe27749a9b65162755721dc6bd1274a6b68bb4f4ca590",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "470c04f3f341046b8b1f07621953bf04b189b1d26b752946b9c6458b0135ae6b",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "8f115d48c6a88577b746d3be55cd82d061cca5d4c3e88efc5bd512232b256e9f",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2022-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "04749edce5b16de720586d2991b0bcc82d9b90d58a71b61958cff07b21ad696c",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "bb7421c9e1bdc6cf72505dddae51b308368b9a5576cc6e1dc6d54177c1e03f4f",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "cc37b4ceb39065292169486243ecdae56d10837140109cbf6e64f120d7a5a8c0",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-03.zip",
+      "source": "monthly",
+      "rows": 44560,
+      "sha256": "b1b9ac81b0d5390fd16a940abcda3c516f985a4d52969dd58d18c841e494e5a4",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "62c0ea0423225d030bf59aef97e602220140032aec658b2844aeb24859e6533e",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "8cc00ebe1d6b450278b98bdea18f816d21fa69671eaf9cb0e0925a25a96baf46",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "9754f722b732368a933155217fd7ec16f37da393d306c47d1b608d57ad544838",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "730131f76369b32ff576813cf33946f0f926bb82def450a031b09a8c7b9f7eb6",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "23ffbbd91367a75f591e9596f0e312926a1a2643fdd42f3745d3fe38eaf68c69",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "4071212eab14a9f696c10a8833bda60ddda785978636720c48d9bdf085687819",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "2af541b5b0549bd733262313abde4ca23d0336372ae6115371f382eb036fb9a7",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "b1f0d061793b7ac08323f83d05c11bca74d6fccd378336a4cffdbd5bb35bde73",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2023-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "f06ce4167de48393865a9f93530f4b43b105085123e1cd7c6aad75c818427d0c",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "f65615b5c4244ef885484c372def227b8c127f062050dd4da090a6dea61f076e",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-02.zip",
+      "source": "monthly",
+      "rows": 41760,
+      "sha256": "0b02182b31c82bbfbf4a3bb50e18af53a767b5a3f24777d3dbcd7cafda43a603",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7e84e7bb51313372076ba538edd35e499ac6167416c63342c35acc8d1eb31786",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "6aea39dc66a9648cddbcb8bb4dea0bc5e6b29216010f1d4d686b4450e492a5c9",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "0cda8b572ac65b62261cc327880e2d2faef1062f9d50fee2ca39e6aba243d10f",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "af21254df2aa6989fb1b1f67b4054fbd99d66ac5796214edea3d5b78f0942df3",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d8fccd2809cef40bd7ad88c926f32f506dc598860912aa8a5dac63f59822e71c",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "af8d30208ada8d602722e3fda266ecd2ee7b3dd81267787c5cb4f12349ee3bf3",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "5664e1a3d7d2af203712e8ad1b2b230992a83242de79095a88672a1d47a2a96c",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "62562940d4eb723a9fdcf6d5255fea368c98c9148bc9d827c9208d5b982bb674",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "7215b7a9994b4a52c97ad0905d031c2d077ba8f6e51080e134327dc4e78453ab",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2024-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "91a8beee9d4255a912f494a9359e09fbd59af5bc01d04d6d7c18707e68160958",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "80e78e6e4f32c208118f3bb33efc46f6352dff3907c929af2061a5b3a0327647",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "211276878319052d5f8075ef3eba8707840bde271d71cff12e3f35c2308de50a",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "0f65ae699a79d633ed6747bb46089cb7f3c9ce4761a58181cc6ef74f90199edb",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ca00b7563c3bcd060cef6baf2229f7a469fa8265eada45cff8b658d5975cfc70",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "25918f1cf84407c5fa0f1e695774c48630e5a34079e44b0887cac6e391b3686b",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "cace0df538c936c2b08fceee3e077a37ef80f792052b3f7dbe9fc14ff384a5f0",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "071b0c252dc835da6e360482de18fe5a82e6064ceb83a3193a1280cbbbf40f44",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "248bf83a4a53457b2218ef50d756885a5f417bdf0e8e33f1dc39b300bc22fa78",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "a306c02aa4c5bfb2cf1b6bb6db88fa5273283ff17d7281e3a963cba1639c6f3f",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d8437030d4f82ed6788da1ac8d34563912b9246b760f51c6b7ab00f164fef5b8",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "e550aa57efd407f79458f3d22d9c823639acaa61dfcd53f28f4cd97874977c98",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2025-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5a5264141cdd21a16fc5e498333e8bd2edd1adff922c64917b19f95a32d78e7c",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "4690a066eb3cb03bef3790f96858272236d549ce987c1c2701b6699d75f86cde",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "56a05789ae7ae04167e84ecb8bdfc181a91224da94ee462c56f6d96d610ad341",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "79bff8b12be9e6687ad6fbc6999000244747fbf96b51785835049d9e6675ca55",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "e270624a9150b568c964d24f6b85e4c130faa9cd65f238e3b4068bea7bcb0c76",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "be95bc2bcc0ebdccd7d824ed780aa79ea06e6595ecaa0dc1192039dc3372a9c0",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "90f68034260729d4f48b88ad7422b8798b4e8d4c16390cbb3db23d3b742b8396",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "856c6ae6f62b0ba1a0a43ebc6ecc3d2f2cfc7b72807331a4384f8c014c4f6d9e",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "03e8cf5a9874442e2fd9981cc60588c0beed6ed8b47ff657c3ec6c397d8bb93b",
+      "sha256_verified": true
+    },
+    {
+      "name": "ADAUSDT-1m-2026-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "bb4d8a12037c66a1ef18a6f686ef90ec532dd1015d94dcbd4a219a2c1d2cdf3b",
+      "sha256_verified": true
+    }
+  ],
+  "missing_days": [],
+  "missing_months": [],
+  "pre_listing": [],
+  "rows": 3021487,
+  "first_bar": "2021-01-01 00:00:00",
+  "last_bar": "2026-09-30 23:59:00",
+  "gaps": [
+    {
+      "start": "2021-02-11 03:41:00",
+      "end": "2021-02-11 04:59:00",
+      "missing_bars": 79,
+      "allowed": false
+    },
+    {
+      "start": "2021-03-06 02:00:00",
+      "end": "2021-03-06 03:29:00",
+      "missing_bars": 90,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-20 02:00:00",
+      "end": "2021-04-20 04:29:00",
+      "missing_bars": 150,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-25 04:01:00",
+      "end": "2021-04-25 08:44:00",
+      "missing_bars": 284,
+      "allowed": false
+    },
+    {
+      "start": "2021-08-13 02:00:00",
+      "end": "2021-08-13 06:29:00",
+      "missing_bars": 270,
+      "allowed": false
+    },
+    {
+      "start": "2021-09-29 07:00:00",
+      "end": "2021-09-29 08:59:00",
+      "missing_bars": 120,
+      "allowed": false
+    },
+    {
+      "start": "2023-03-24 12:40:00",
+      "end": "2023-03-24 13:59:00",
+      "missing_bars": 80,
+      "allowed": false
+    }
+  ],
+  "allowed_gaps": [],
+  "republished": []
+}

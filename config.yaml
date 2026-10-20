@@ -9,7 +9,7 @@ paper_trading: true      # true = Binance testnet; false = real funds
 testnet_url: https://testnet.binance.vision
 
 data:
-  symbols: [NEARUSDT, ETHUSDT, SOLUSDT, BTCUSDT]   # download + validation universe
+  symbols: [NEARUSDT, ETHUSDT, SOLUSDT, BTCUSDT, BCHUSDT, DOGEUSDT, ADAUSDT, LINKUSDT]   # download + validation universe
   start: "2023-01-01"    # fixed window, inclusive
   end: ""                # exclusive; empty = latest complete UTC day
   dir: data

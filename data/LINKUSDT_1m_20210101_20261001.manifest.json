@@ -1,0 +1,542 @@
+{
+  "symbol": "LINKUSDT",
+  "start": "2021-01-01",
+  "end": "2026-10-01",
+  "files": [
+    {
+      "name": "LINKUSDT-1m-2021-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "fa6596426389cbdb9a3e05419b7fbb542a7659e64a002e13bc88f390f2170ff4",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-02.zip",
+      "source": "monthly",
+      "rows": 40241,
+      "sha256": "da56ff4981ecce15bab46e12fc01cba7204ef1cf65d03dc6f765214b142306e6",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-03.zip",
+      "source": "monthly",
+      "rows": 44550,
+      "sha256": "df65da9ce233300fbc1b1989852491f9d129c67ea662b429e0103331fe065580",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-04.zip",
+      "source": "monthly",
+      "rows": 42766,
+      "sha256": "b67fa0b663340ceeddfd2757fc42d20c3aed84c749fc85da526c96320e67ef9a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "3869bf7b6b5b1779b0c569e4e947db7d093803c791062014384d047b3f79f338",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "228f6e27825d971e657ae1bf400ab7d875112b4c8b210c5dc1bdaef00e087ce9",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "639f74de9d37e289a789573743f129944c2f3f5a7770ed7478de47fb8ae58967",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-08.zip",
+      "source": "monthly",
+      "rows": 44370,
+      "sha256": "4a912b60b172152a64317a95e28cbaa63f27fe435feda439611110e144cf429e",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-09.zip",
+      "source": "monthly",
+      "rows": 43080,
+      "sha256": "b9f4dc36fccd646e86bc7fcadc82fb7a8df68752ed5b280925d278d110990a59",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "12970ce13839ff3518c4bf0b9b4c0237f0a2217fbb180cb9b8665d0ea8608c0d",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ba80d4269eaeccf06ae6a5053a95da056f08098767fcf98933f2a4dca243be49",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2021-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5005e41c08ece631aaa68d94d14a22a2a20dae0e8acba9e40d4f54064d685df1",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "51c2501c62b93ea8dcdecd79935a0942b235b4c777e0bdd6c201b9e6e080fd89",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "fc2597d7ad378d85460120eea458942ad496e7afc0688a0e9700fcd2c5e67775",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "b3537b52dff823f46a4a2462cc6afa69a5ba7a4be0b7ef24b62c44451d902235",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "5aa298e5ffd61a04aedd5316511be61489ce41d8ff9e0e5f28f9e4341ee3a492",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "bd246bb9222f686c18a1626aa48db17e8bf7297c160a53a886b3d50e14a236e9",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ecb9e844cd1872037d2892e8c2170df641b7708b9b7a0514af1315da63f77e8f",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d9c4ddd49084e06a9b27de31ad7619b6bb221a501f1ca01e68850a909f69d2e1",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "9a40bc28e9e4eadcd0eb3eba4aca959dc7f11b792930e52bca3514aaf144c0c3",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "d8b07c404e4a9e17abe918ce3a27d0dcda25ce1c24cecc7ffdd9c59addf800b6",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "4c7a29d7b9d27eefe67952ae98fbaf30c4bcc0d966698255867c0b416acc11c7",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ff0fc1d8f184c15da03c8cd0e889d4127bf0b3e33ca20f853392e72f1e5d1f99",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2022-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "54d4d9daacd14cf12ae71972307c50ee04f046691dc7b8c40aed8f89f8107b82",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "628abf24c21ef085c248348673324a332fcf7bd4c166b8be16e560f8f2b1cb71",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "dd0edfb3f5be40c662fa0e8699c9cc4078686c7888a69ba8b0cfa19bf0ff50eb",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-03.zip",
+      "source": "monthly",
+      "rows": 44560,
+      "sha256": "03549a7e7fd1ec1f0bf74a2abdd0eeeecdf2bc44e0efcdc18f99c94020246f25",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "cce50d92eba8d857591080af2013c737a4ecb0b046d0ad131e161daae47ff0aa",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "069af67673755a89ec9b50b8654d3c13906f3e2a6201a9acc5078699ee9c95b2",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "2157194db6dc58c2e5715e5542e7fcb0f3aebdd9a45d8e0be2c9bc95d6a70506",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "a989422c129538e4755763c550cdbb3af11020011102e672bf03c6eb4ff3d2bb",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "68fb9a26815ad49e16752978b372f34bdb5eec6166e5b7a83d2890e7548a4a1a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "42f53c3314c0d5bc00ccac282716efa6bc4713eb99d39a5b5a66c8f6b4acecd2",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "76d1c30b97583c978857ff5fc87aa557d954e7f716e4139cea5efc20c01c78c8",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "297d5d5d5dab56d5f4ddb7d80a283d2024a8d5487393687959d50bc7501f7147",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2023-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "240fe8168967c8f336a6dd52028a9ceaaef33fe93b07a5bc147078d1da7c028c",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "01189893e8b435303a272a6f0cb7f98bee8d2a85a2aa3c3c25ea01f0654ea811",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-02.zip",
+      "source": "monthly",
+      "rows": 41760,
+      "sha256": "c759efd70ac92aba837bf2fa3cc8076b1516c6dacea478da32f98b7900ce5dea",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "7b730ce685aad37344dcd09586dde3b5d6142f26ae4daa6b453758ea68a37d28",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "a79286d6c32cacf4626902581fbd703644b1f671519667a28c60cbb15a9b8d8a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "a36c5ee8fa592d6e0b0e11717f0d705d14c43883a5aa48a791348f6ec884bf80",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "b766d2b8405f4c7a7905bf199049f2a29284e35283f8dfa5b39996a9dedad2f7",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "951b3db2aa3ec37e50fa28c20a0fcd4a7b0593fbdbeaebafce0611e877f92f79",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "4e50a4b2e4bba93250922cf28a6afb9a943749d03716e4ee9fe036de1d9cd16c",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "f0c4a4cdbd8db90ebf60d5593558cec1d7db6ecd68779a4748095478ae77772a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "4dd9f6b9fc956972de78c71560ce23cbece7dc2c2271321f2c3bcf6ea24b253b",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "1ff04f43e31c2882e963e0452e5a4b92e6b22590f6ab6b2acd462343f6172473",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2024-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "350da9d1e108006678bf992a123c6deb1b5b988e4f52b4471e653f59e17b7cf0",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d3781d35cb08925aec47ae80f528f4f235e6caa287ea0c39d594d9244c044afb",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "fa1d7727cb64ab929cc24c18263fcdcdae421ff3d111920818f7dccdada2d44a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "3d6bf01bb9e0d0c1f6e2f73580655a827f624649c53235137c8b46919ffcaf70",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "97c7667971c5eacd6e2d1a2e16f53200a59bc053f70a60b8dcd945d4c8e72467",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d57ac5370bf8a0f33275fb48798d0b0fc25800a9f9952978b322c4d12a218ebc",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "a1bdb812df15827cef4095eab0eeaf023284e47ce7120bd07f711edc5b61e4ff",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d103165d5a02068c70a2685edbba2ca390cc5d88e07e93c8cd8f7ed486d82882",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "28f9cf0ad9bb63852a31560118f4aeb835b99480c6e75bd62df444aae80c16ec",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "ecb6b6484225ed9a132e60ab7686f5d518d35e9fe711838a3c728cb26d241545",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-10.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "437fb268f3e2a522894a8e484602dadde696e04ae4e03668556e98b3866a3346",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-11.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "d4c98a9b775960b06cbec4aee5e9c435e8534e674e214105d3971183b1b3be1d",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2025-12.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "58a247192cbfee0b44746f1fbb6ed749a53776d253c90ed4ab135aae45cb2af7",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-01.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c8f7e670634eded324a7e51df4aa6b63434ac22059d647b33d44904eb1fa3793",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-02.zip",
+      "source": "monthly",
+      "rows": 40320,
+      "sha256": "60af77b6cc220faf061a9e48df6d8ca429f0826f7f0b73ad21856a7063c02c5f",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-03.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "5748a01da70cef0f73e29d5dc4d026cb2108787cc482c88cc1f4ae86b6e42107",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-04.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "e051d0a9b5674b6b2ad9c60a33b624759f5ac4c772944a3fbd46c5a5785207b4",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-05.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "93b44c81989b46adf7acd032dabd238483bb58c5a8f34c21650999dd7714f0bc",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-06.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "fdf3e54ab0426aeb40cb97e3ba4a0c5169d0d2af92046c1066f4fc06fed0345c",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-07.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "d2b1ca9f7d84efb97bf1fa658c18efce31cc7f15b1e1489436d88d6e053d40fb",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-08.zip",
+      "source": "monthly",
+      "rows": 44640,
+      "sha256": "c7a1e12faf1c61e3846432d3570fa2eb57c8ce8b711209444e854245cf43e85a",
+      "sha256_verified": true
+    },
+    {
+      "name": "LINKUSDT-1m-2026-09.zip",
+      "source": "monthly",
+      "rows": 43200,
+      "sha256": "47e0c4088f9a17b3f86ffe6d3ba9b4215985cf09e49574ed96823f77def48ed1",
+      "sha256_verified": true
+    }
+  ],
+  "missing_days": [],
+  "missing_months": [],
+  "pre_listing": [],
+  "rows": 3021487,
+  "first_bar": "2021-01-01 00:00:00",
+  "last_bar": "2026-09-30 23:59:00",
+  "gaps": [
+    {
+      "start": "2021-02-11 03:41:00",
+      "end": "2021-02-11 04:59:00",
+      "missing_bars": 79,
+      "allowed": false
+    },
+    {
+      "start": "2021-03-06 02:00:00",
+      "end": "2021-03-06 03:29:00",
+      "missing_bars": 90,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-20 02:00:00",
+      "end": "2021-04-20 04:29:00",
+      "missing_bars": 150,
+      "allowed": false
+    },
+    {
+      "start": "2021-04-25 04:01:00",
+      "end": "2021-04-25 08:44:00",
+      "missing_bars": 284,
+      "allowed": false
+    },
+    {
+      "start": "2021-08-13 02:00:00",
+      "end": "2021-08-13 06:29:00",
+      "missing_bars": 270,
+      "allowed": false
+    },
+    {
+      "start": "2021-09-29 07:00:00",
+      "end": "2021-09-29 08:59:00",
+      "missing_bars": 120,
+      "allowed": false
+    },
+    {
+      "start": "2023-03-24 12:40:00",
+      "end": "2023-03-24 13:59:00",
+      "missing_bars": 80,
+      "allowed": false
+    }
+  ],
+  "allowed_gaps": [],
+  "republished": []
+}
